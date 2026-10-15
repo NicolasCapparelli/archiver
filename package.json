@@ -1,0 +1,40 @@
+{
+  "name": "archiver",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "desktop": "node tools/desktop.mjs dev",
+    "desktop:build": "node tools/desktop.mjs build",
+    "launch": "node tools/launch.mjs",
+    "check:rust": "node tools/desktop.mjs check",
+    "test": "node tools/desktop.mjs test",
+    "test:ui": "node --test tools/navigation.test.ts tools/clink.test.mjs tools/text-tools.test.ts tools/highlight.test.ts tools/diff.test.ts tools/emoji.test.ts tools/text-find.test.ts",
+    "test:shell": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test-shell.ps1",
+    "test:setup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test-install.ps1",
+    "test:cli": "node tools/test-cli.mjs",
+    "test:ocr": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test-ocr.ps1",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/instrument-serif": "^5.3.0",
+    "@tauri-apps/api": "^2.8.0",
+    "highlight.js": "^11.12.0",
+    "jsonc-parser": "^3.3.1",
+    "lucide-react": "^0.577.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.0",
+    "@types/react": "~19.2.2",
+    "@types/react-dom": "~19.2.2",
+    "@vitejs/plugin-react": "^5.0.0",
+    "fengari": "^0.1.5",
+    "typescript": "~6.0.3",
+    "vite": "^7.3.0"
+  }
+}

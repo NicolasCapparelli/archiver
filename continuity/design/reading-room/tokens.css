@@ -1,0 +1,55 @@
+/* Proposed Reading Room theme. Study only; not imported by the application. */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #F5F1E8;
+  --panel: #FFFCF5;
+  --raised: #EDE7DA;
+  --line: #D7D0C1;
+  --control-border: #817B70;
+  --ink: #252B28;
+  --muted: #62695F;
+  --faint: #62695F;
+  --accent: #214E44;
+  --accent-bg: #DFE9E2;
+  --command: #73572C;
+  --command-bg: #EEE3CE;
+  --amber: #815B1B;
+  --success: #2E614B;
+  --danger: #A33C32;
+  --danger-bg: #F7E5DF;
+  /* Compatibility aliases for current command/highlight selectors. */
+  --violet: var(--command);
+  --violet-bg: var(--command-bg);
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "DM Sans", "Segoe UI", sans-serif;
+  --mono: Consolas, "SFMono-Regular", monospace;
+  --radius-control: 6px;
+  --radius-panel: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --duration-control: 100ms;
+  --duration-panel: 140ms;
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #191F1C;
+  --panel: #202823;
+  --raised: #2A332D;
+  --line: #3B4940;
+  --control-border: #84958A;
+  --ink: #EEECE3;
+  --muted: #AFB8AE;
+  --faint: #A2ADA1;
+  --accent: #A6C8B5;
+  --accent-bg: #30473B;
+  --command: #D7BB87;
+  --command-bg: #443A28;
+  --amber: #E1C083;
+  --success: #A6C8B5;
+  --danger: #F0A49B;
+  --danger-bg: #4B2A29;
+}

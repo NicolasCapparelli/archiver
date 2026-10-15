@@ -1,0 +1,15 @@
+import { spawnSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import { homedir } from 'node:os';
+import path from 'node:path';
+const action = process.argv[2] ?? 'dev';
+if (!['dev', 'build', 'check', 'test'].includes(action)) throw new Error('Unknown action');
+const rustBin = path.join(homedir(), '.cargo', 'bin');
+const env = { ...process.env, PATH: `${rustBin}${path.delimiter}${process.env.PATH}`, CARGO_TARGET_DIR: path.resolve('target') };
+const cargo = existsSync(path.join(rustBin, 'cargo.exe')) ? path.join(rustBin, 'cargo.exe') : 'cargo';
+const isCargo = action === 'check' || action === 'test';
+const cmd = isCargo ? cargo : process.execPath;
+const args = isCargo ? [action, '--manifest-path', 'src-tauri/Cargo.toml', ...(action === 'test' ? ['--lib'] : [])] : ['node_modules/@tauri-apps/cli/tauri.js', action, ...(action === 'build' ? ['--no-bundle'] : [])];
+const result = spawnSync(cmd, args, { env, stdio: 'inherit' });
+if (result.error) console.error(result.error.message);
+process.exit(result.status ?? 1);

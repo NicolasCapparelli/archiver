@@ -1,0 +1,102 @@
+# Implemented capabilities (baseline)
+
+Migrated 2026-10-13 from the root STATUS.md "Implemented" section (dated 2026-10-12) plus the "Current behavior to preserve" list of the root HANDOFF.md. This is the detailed capability description; the in-app list is `src/feature-catalog.tsx` (Archivist Settings, "Everything in Archiver"), which must stay aligned with it. Items 6a (2026-10-13) are implemented in source but unverified natively ([status](../status.md#pending-human-checks)). Dated checks that supported these claims are in [history](../history/status-2026-10-12.md); no claim here is a fresh verification.
+
+## Implemented
+
+R13 (2026-10-14): selected Archivist details are replaced as one keyed subtree with distinct component keys, addressing user-reported accumulating previews/Transform controls. Snippets explicitly maintain group/row selection and restore navigation focus after rendering, traverse visible headings/rows with arrows/Home/End/PageUp/PageDown and Enter collapse; emoji Up/Down enters grid focus from search and Left/Right then moves cells. Native recheck pending H19. Full clip, Paste Playground and Expanded Librarian share Ctrl+F literal case-insensitive text find: all matches highlighted with active occurrence/count, Enter/Shift+Enter or F3/Shift+F3 wraps and scrolls, Escape dismisses find before exiting viewer. No text mutation; syntax colors return after find closes (matching find uses a plain backdrop). Source build/typecheck and 18 UI helpers pass.
+
+Emoji catalog (R10, 2026-10-13): Ctrl+Shift+J or command palette opens a Reading Room dialog in Librarian/Archivist. Offline Unicode 16.0 catalog has 3,781 fully qualified sequences, including skin tones, flags and joined emoji; English names/categories, exact symbols, shortcode-style words and common aliases are searchable. Category chooser, incremental rows, arrows/W/S outside input, Home/End/PgUp/PgDn and Ctrl+K search. Enter/Shift+Enter copies Unicode text; Ctrl+Enter/Ctrl+Shift+Enter uses existing Windows paste target/focus/busy/terminal checks. Escape closes; Archivist has Copy/Paste buttons. Browsing never writes archive items; explicit clipboard delivery follows normal capture policy. Native font coverage determines glyph availability; native delivery and visual checks pending H16. Catalog is lazy-loaded. Source data/license retained in `src/data/`; regenerate with `node tools/generate-emoji.mjs`.
+
+Reading Room migration implemented: shared catalog-card identity, warm paper/deep spruce themes, brass command accents, editorial headings, visible scrollbars and focus, Librarian scope controls, and locally scrolling Archivist results/details. Shared tools, settings, syntax, diffs, platform icons, and transparent tray use the new language. Saved appearance initializes before page paint; the default stays dark. [reading-room/MIGRATION.md](../design/reading-room/MIGRATION.md) records checks and remaining native validation. The [roadmap](../planning/roadmap.md#next-agent-queue-q1q7) retains the planned feature queue (Q1-Q7); Q1/Q2/Q5/Q6 are implemented; Q3/Q4/Q7 remain planned.
+
+1. Previous-window/control tracking, checked Windows focus restoration, explicit paste, stale-target rejection, and balanced Ctrl+V input.
+2. Literal PowerShell/Clink editing-buffer insertion with multiline fidelity, expiry, single consumption, and acknowledgement. No Enter.
+3. Lazy persisted thumbnails and full-size image previews with bounded decoding.
+4. Synchronous syntax highlighting for commands, code, JSON, and SQL.
+5. Named editable snippets separate from captured history.
+6. Whitespace, case, JSON formatting, and URL-decoding transformations, plus a Syntax Highlighting transform (auto-detect or manual language).
+6a. Full clip viewer (Ctrl+O dialog; Ctrl+Shift+L Expanded Librarian), Paste Playground (Ctrl+Shift+N), and Expanded Librarian (Librarian temporarily grows to 1040×800, bounded to the monitor, and restores on exit). Transforms prepare text; explicit Ctrl+S overwrite keeps previous text in revisions, and Ctrl+Shift+S saves a new clip. Implemented 2026-10-13; frontend build/typecheck, Rust check and tests pass, but native resize/restore and the replacement Ctrl+Alt+O shortcut are not yet verified in the running app; the old Ctrl+Shift+O attempts failed in user testing. Colored/inset highlight shadows were removed app-wide.
+7. Editable literal template placeholders with defaults.
+8. Directory-prioritized quick-access commands based on historical occurrences.
+9. Completion success/exit codes/durations and failed-command search.
+10. Transactional idempotent PSReadLine and Clink export imports.
+11. Experimental Bash/Zsh/Fish/WSL adapters and Unix setup.
+12. Shell readiness/insertion/connection indicators; WSL PID verification unavailable.
+13. Paged occurrence timelines.
+14. Ordered clip combination with configurable separators.
+15. Shared paste queues with explicit advance/skip/clear and failure-preserving advancement.
+16. Explicit bounded URL-title fetching, title search, and domain browsing.
+17. File availability/metadata, bounded text/code previews, and image thumbnails.
+18. Undo after explicitly configuring recovery; transactional restoration and expiry cleanup.
+19. Consistent-snapshot JSONL export and verified SQLite backup with SHA-256 manifests.
+20. Opt-in launch at sign-in, configured manual updater, and NSIS signing/release pipeline.
+21. Searchable command palette discovering available controls and a shortcut reference.
+22. archiverctl commands and a persistent stdio JSON Lines API for agents.
+
+The Librarian quick panel uses 480×720 dimensions bounded to the monitor work area, with one footer shortcut row and F1 opening the complete shortcut/tool dialog. Ctrl+T explicitly focuses the first transformation and restores option focus after an error. Filters/saved searches and combination/paste queues use shortcuts/dialogs, with explicit palette actions retained. The Archivist full window browses the entire archive. Ctrl+Shift+A includes archive results in the Librarian; Ctrl+Shift+Backspace clears library membership without deleting history. Captures restore membership; command retries do not. Library migration, persistence, deletion recovery, exports, and agent API controls are implemented. Named snippets remain separately available. Earlier fixes remain: Ctrl+Win+Period configuration, keyboard navigation, exclusions, clipboard event/padding normalization, Windows shell setup, and responsive sidebar sizing.
+
+Windows OCR uses installed recognition languages through a hidden, embedded PowerShell/WinRT worker. Automatic OCR now queues individual copied unscanned images after persistence; the worker checks queued IDs every five seconds. Catch-up scanning defaults to two hours, processes up to 25 unscanned images per interval, and pauses between images when capture is paused. Settings independently toggles capture-triggered scanning and supports catch-up intervals of 30–86400 seconds or 0 to disable catch-up. Legacy 60-second settings without ocrOnCapture migrate to 7200; explicit disabled/custom intervals remain. Successful, empty, and failed results persist, preventing automatic rescanning; manual extraction/retry/batch scanning remains available. Timed and manual jobs share an atomic worker guard. OCR previews are bounded to 2048×2048; workers time out after 40 seconds and remove temporary PNG files. OCR text participates in literal/fuzzy search, CLI reads, portable exports, backup, and deletion recovery. Failed retries preserve prior recognized text. Recognition is Windows-only; other platform adapters remain future work.
+
+Two staged features received further implementation: recorded terminal sessions now have paged chronological execution transcripts preserving repeats and per-submission completion/directory data; Ctrl+Shift+S creates a named snippet from the selected text/command. The local CLI/API also adds library counts/clear/restore and session transcripts.
+
+## Librarian improvements (2026-10-13, R6 + Q1/Q5)
+
+- W/S result navigation and A/D tabs outside editing fields; arrows retain query navigation. Reopening defaults to All, cleared query/filters, library scope and first result/top; R11 adds opt-in Librarian state memory. PgUp/PgDn jump to the first/last current result; PgDn loads remaining pages. Full bottom loading grows with result count and has no measured performance guarantee.
+- Saving a snippet explicitly closes its modal, clears the query, opens Snippets and restores result focus (R7 follow-up). R11 supersedes type grouping with collapsible user-defined groups and Ungrouped; changing a search expands matching groups.
+- Tab/scope-aware search placeholders; F1 and Settings show searchable command cards, grouped when query is empty.
+- Durable undo library clear: Ctrl+Shift+Z, F1, palette and post-clear banner. Undo merges the last nonempty membership snapshot with current membership, survives restart, skips deleted items, and is idempotent. SQLite backups include it; JSONL exports and deletion recovery exclude it. CLI/API expose `library undo-clear` / `undo_library_clear`.
+- Librarian organization dialog: Ctrl+Shift+G, F1 and palette. Select up to 500 loaded results, add/remove tags and collections atomically without replacing unrelated labels; use Ctrl+Shift+F filters to browse labels. Desktop-only; browser sample disables writes.
+- Automated checks cover backend persistence/union/deletion, backup preservation, atomic bulk rollback, duplicate labels, mixed item types/snippets and CLI/API undo. Native interaction/visual checks remain pending H9-H11.
+
+## Follow-up workflows and selected extras (R7)
+
+- Ctrl+Alt+O replaces the failing Ctrl+Shift+O. Native focused registration plus capture-phase webview handler; failures surface in health. Native success remains unverified. Opening Librarian and saving snippets focus results, leaving WASD immediately usable; Ctrl+K focuses search.
+- Snippet name/note/content editing through Ctrl+T in both windows. Notes are persistent metadata, never included in pasted content. In the editor Ctrl+S saves, Ctrl+T opens an arrow/Enter transform picker. Playground/Full Clip Ctrl+Alt+S saves text as snippet. R9 restores main-window create/edit/save/cancel/transform buttons; Librarian keeps shortcut hints and pickers.
+- Archivist collection-group chips above results: Ctrl+Alt+G creates a group, drag clips or snippets onto chips or Ctrl+Alt+M moves through arrows/Enter. No persistent create/move form. Moves replace all collection memberships while preserving tags and archive content. Empty groups persist as `Group: …` saved searches. SQLite backups preserve definitions; portable exports preserve memberships but omit saved-search/empty-group definitions, as before.
+- Q2: bounded OCR match excerpts/highlights in image result rows and details; fuzzy text highlights the first approximate/prefix matching OCR word and is labeled. No rescan or original-image alteration; empty-query browsing omits excerpts.
+- Q6: scope vocabulary and associations before candidate limits, preserving ranking/pagination; isolated sparse-library regression and local debug measurements recorded in the roadmap. No million-event/performance guarantee.
+- I20: opt-in Follow system appearance, resolved before first paint, live OS change listening and preference synchronization across windows. Default remains dark.
+- Regression tests cover note migration/restart/old recovery records, group persistence/moves, bounded Unicode OCR metadata and scoped fuzzy budgets. H3/H12/H13 remain native checks.
+
+## Keyboard-first UI cleanup (R8)
+
+R8 UI cleanup (2026-10-13): result keyboard focus shares the single selection border/background rather than an offset second outline. Librarian tool dialog headers display Esc hints; R9 restores Archivist Close buttons. Other controls retain visible focus with an inset outline. Initial result focus waits for rendered rows; nested snippet transforms restore editor focus. Browser sample checks and native limitations are recorded in the implementation log; H14 remains pending.
+
+
+## Search and indexing limits
+
+Moved from the root STATUS.md verification text: fuzzy indexing is bounded to the first 32,768 characters and 512 words per item, with 48-character words and at most eight query words. Queries are capped at 512 bytes; lookups cap vocabulary candidates at 1,000 per lookup and associations at 20,000 per word. Existing archives receive synchronous one-time index and library migrations. Literal library search starts from library membership; fuzzy vocabulary/postings are scoped to library membership or snippets before limits (Q6 implemented). Limits remain within each scope; type/source/tag filters are applied afterward. Literal search covers full stored text. Recorded sessions show the latest 100 groups; their item search groups unique commands while the execution timeline preserves every submission. Archive-wide: durable history is unencrypted, permanent by default, and captures all sources unless explicitly excluded.
+
+## Behavior to preserve (from the 2026-10-12 handoff)
+
+- Librarian is the compact quick panel; Archivist is the full archive window. Library membership is separate from permanent items and occurrences. Clearing the library deletes only membership, and genuine recapture makes an archived item visible again. Delivery retries do not resurface commands. Named snippets remain separately available.
+- Librarian has one shortcut footer, F1 opens the full reference/tools, bordered keycaps, visible destination, and an Archivist button. Ctrl+Alt+O opens Archivist (R7 supersedes the original Ctrl+Shift+O requirement), Ctrl+Shift+A toggles archive search, Ctrl+Shift+Backspace clears the library, Ctrl+T transforms/copies, and Ctrl+Shift+S creates a named snippet.
+- Windows OCR queues the copied unscanned image's ID after persistence; a background worker checks queued IDs every five seconds. Catch-up scans default to two hours and process at most 25 unscanned images. Both paths share the manual worker guard and respect capture pause. Successful, empty, and failed results persist. Manual retry may rescan; automatic work must not. `ocrOnCapture` and `ocrIntervalSeconds` are independent. A legacy 60-second interval without the new setting migrates to 7200 on load; explicit disable/custom intervals survive.
+- Experimental Unix hooks are not validated native macOS/Linux support. Ctrl+R shell search remains explicitly deferred.
+
+## Reading Room design migration (summary)
+
+Implemented 2026-10-12; actual changes and checks: [Reading Room migration record](../design/reading-room/MIGRATION.md). Visual language: [design system](../design/system.md).
+
+## Archivist controls and snippet vault (R9)
+
+User architecture clarified 2026-10-13: Archivist is a conventional UI with visible controls; Librarian tool actions use shortcuts. Main-window buttons now cover new/edit snippets, save/cancel/transform, group creation/moves, library undo, Full clip, Paste Playground, and dialog dismissal. Full clip/Playground have copy, transform, language, save and snippet buttons; quick-window footers remain shortcut hints.
+
+Pins have separate durable `title` metadata, shown in results/details and searched literally/fuzzily. Rename via Archivist button/item actions menu or F2 in either window; F2 opens snippet editing for snippets. Renaming preserves payload, deduplication identity and capture times; names survive recapture/restart/recovery and exports/backups. Legacy five-column item recovery records default title to empty. The details three-dot control now opens a working dismissible menu with copy, pin, rename/edit, move, labels, full clip and snippet actions as applicable.
+
+Archivist Snippets is a vault with named cards, note previews, user-defined collapsible groups, membership badges, search and collection chips (R11 replaces type grouping). Create groups with buttons, choose a group when creating a snippet, or drag/drop/use Move selected afterward. New snippet and group membership commit together; edits preserve membership and notes; creation returns to the chosen group. Empty groups persist through saved searches. Moving replaces collections and preserves tags/content. Notes are not searched or pasted. Native/visual H15 pending; automated results in status/log.
+
+Full clip opened on an existing snippet routes Save to snippet/Ctrl+S back into the snippet editor, retaining its name, type and note; it does not use the history overwrite command. Saving a command clip as a snippet retains command type.
+
+## User groups, state memory and statistics (R11)
+
+Snippets in both windows default to named collection sections sorted alphabetically, then Ungrouped. Empty groups appear without a query; multiple memberships render the snippet in every relevant section. Archivist cards display membership badges. Snippet pages fetch the complete matching vault for accurate group counts; large vault memory/time has not been benchmarked. Visible headings and rows are traversable using arrows/W/S; Left/Right expand/collapse, Enter toggles headings, A/D retain tab switching. Rename group in Archivist atomically updates collection labels, empty-group definitions and saved-search collection references, preserving tags, payloads and history; conflicting names are rejected.
+
+Librarian state memory is off by default, including old settings files. Opening resets to All, clears query/options/archive scope, closes tools, selects the newest visible library item and scrolls to top with result focus. Opt-in memory restores tab/query/options/scope/selection/collapses/scroll and loaded pagination; editing dialogs are closed. Preference persists in settings.json; quick-webview localStorage holds browsing state. Native focus ordering remains a human check.
+
+Archivist categories use the sidebar only. Statistics is a dedicated sidebar page with previous totals plus content size, snippets, groups, pins, library size, source counts, total repeated captures, type/source breakdowns and first/latest dates. Read-only aggregate queries use permanent archive data; clearing library changes its visibility count, not history totals. Build, 14 UI helper tests, 55 Rust tests (2 ignored) and Rust check pass; H17 covers native and visual behavior.
+
+## R12: Emoji grid, meaning search and Archivist corrections (2026-10-13)
+
+Emoji catalog uses responsive 44px grid cells, named tooltips/accessibility labels and a selected-name caption. Arrow/WASD movement follows actual column count; left/right retain cursor movement in search. Enter copy and Ctrl+Enter paste variants retained. Offline curated meaning keywords connect scared/afraid/terrified, nervous, tired, grateful, hungry, coding and other concepts; exact names rank before related meanings. This is a bounded vocabulary, not a general AI semantic index. Groups are snippet-only in Archivist: strip, palette/shortcut moves and drag/drop; ordinary items show tags, with previous collection metadata preserved. Bulk groups require all selected rows to be snippets. Compact archive heading removes YOUR PERSONAL RECORD and uses a 28px serif title. Details reset scroll on selection; grid row and image sizing are bounded. User-reported image-list appearance remains unconfirmed by visual/native review (H18).

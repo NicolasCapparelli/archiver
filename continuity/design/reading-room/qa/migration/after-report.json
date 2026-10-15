@@ -1,0 +1,181 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "role": "archivist",
+      "theme": "dark",
+      "scale": 1,
+      "width": 1280,
+      "height": 850,
+      "scrollWidth": 1280,
+      "details": 795,
+      "resultHeight": 263,
+      "detailsVisible": true
+    },
+    {
+      "role": "librarian",
+      "theme": "dark",
+      "scale": 1,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "archivist-small",
+      "theme": "dark",
+      "scale": 1,
+      "width": 900,
+      "height": 400,
+      "scrollWidth": 900,
+      "details": 358,
+      "resultHeight": 69,
+      "detailsVisible": true
+    },
+    {
+      "role": "librarian-small",
+      "theme": "dark",
+      "scale": 1,
+      "width": 480,
+      "height": 400,
+      "scrollWidth": 480,
+      "footer": 391,
+      "resultHeight": 139,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-125",
+      "theme": "dark",
+      "scale": 1.25,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-150",
+      "theme": "dark",
+      "scale": 1.5,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-200",
+      "theme": "dark",
+      "scale": 2,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "archivist-narrow",
+      "theme": "dark",
+      "scale": 1,
+      "width": 650,
+      "height": 700,
+      "scrollWidth": 650,
+      "details": 2069.6875,
+      "resultHeight": 360,
+      "detailsVisible": true
+    },
+    {
+      "role": "archivist",
+      "theme": "light",
+      "scale": 1,
+      "width": 1280,
+      "height": 850,
+      "scrollWidth": 1280,
+      "details": 795,
+      "resultHeight": 263,
+      "detailsVisible": true
+    },
+    {
+      "role": "librarian",
+      "theme": "light",
+      "scale": 1,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "archivist-small",
+      "theme": "light",
+      "scale": 1,
+      "width": 900,
+      "height": 400,
+      "scrollWidth": 900,
+      "details": 358,
+      "resultHeight": 69,
+      "detailsVisible": true
+    },
+    {
+      "role": "librarian-small",
+      "theme": "light",
+      "scale": 1,
+      "width": 480,
+      "height": 400,
+      "scrollWidth": 480,
+      "footer": 391,
+      "resultHeight": 139,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-125",
+      "theme": "light",
+      "scale": 1.25,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-150",
+      "theme": "light",
+      "scale": 1.5,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "librarian-200",
+      "theme": "light",
+      "scale": 2,
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703,
+      "resultHeight": 417,
+      "detailsVisible": false
+    },
+    {
+      "role": "archivist-narrow",
+      "theme": "light",
+      "scale": 1,
+      "width": 650,
+      "height": 700,
+      "scrollWidth": 650,
+      "details": 2069.6875,
+      "resultHeight": 360,
+      "detailsVisible": true
+    }
+  ]
+}

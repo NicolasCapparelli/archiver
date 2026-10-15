@@ -1,0 +1,69 @@
+{
+  "errors": [],
+  "results": [
+    {
+      "role": "archivist",
+      "theme": "dark",
+      "width": 1280,
+      "height": 850,
+      "scrollWidth": 1280,
+      "details": 1530.1875
+    },
+    {
+      "role": "librarian",
+      "theme": "dark",
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703
+    },
+    {
+      "role": "archivist-small",
+      "theme": "dark",
+      "width": 900,
+      "height": 400,
+      "scrollWidth": 900,
+      "details": 1374.1875
+    },
+    {
+      "role": "librarian-small",
+      "theme": "dark",
+      "width": 480,
+      "height": 400,
+      "scrollWidth": 480,
+      "footer": 383
+    },
+    {
+      "role": "archivist",
+      "theme": "light",
+      "width": 1280,
+      "height": 850,
+      "scrollWidth": 1280,
+      "details": 1530.1875
+    },
+    {
+      "role": "librarian",
+      "theme": "light",
+      "width": 480,
+      "height": 720,
+      "scrollWidth": 480,
+      "footer": 703
+    },
+    {
+      "role": "archivist-small",
+      "theme": "light",
+      "width": 900,
+      "height": 400,
+      "scrollWidth": 900,
+      "details": 1374.1875
+    },
+    {
+      "role": "librarian-small",
+      "theme": "light",
+      "width": 480,
+      "height": 400,
+      "scrollWidth": 480,
+      "footer": 383
+    }
+  ]
+}

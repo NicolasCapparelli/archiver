@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Archiver design study — Reading Room</title>
+  <link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="study.css">
+</head>
+<body>
+<div class="study-controls">
+  <a href="#cover" class="control-brand">Archiver <span>Design study / 01</span></a>
+  <nav aria-label="Study navigation"><a href="#roles">Roles</a><a href="#identity">Identity</a><a href="#librarian">Librarian</a><a href="#archivist">Archivist</a><a href="#handoff">Handoff</a></nav>
+  <button id="theme-toggle" aria-pressed="false">Preview dark theme</button>
+</div>
+<main>
+<section class="sheet cover" id="cover">
+  <div class="folio">ARCHIVER <span>DESIGN DIRECTION / OCTOBER 12 2026</span></div>
+  <div class="cover-grid">
+    <div><div class="brand-lockup"><img src="assets/archiver-mark.svg" alt="Archiver catalog card logo"><span>Archiver</span></div>
+      <p class="eyebrow">A NEW LANGUAGE FOR LIBRARIAN AND ARCHIVIST</p>
+      <h1>The Reading<br>Room</h1>
+      <p class="intro">A calm place to retrieve your work.<br>A dependable place to preserve its history.</p>
+      <p class="cover-note">One product. Two complementary roles. Warm paper, deep ink, catalog tabs, and an identity built around keeping things findable.</p>
+      <span class="proposal">PROPOSED DIRECTION · APP MIGRATION PENDING</span>
+    </div>
+    <figure class="hero-plate"><img src="assets/brand-concept.png" alt="Creative direction plate with a catalog card logo, Archiver wordmark, and paper cards labeled Librarian and Archivist"><figcaption>Creative reference. Material cues become flat color and precise geometry in the interface.</figcaption></figure>
+  </div>
+  <footer class="page-footer"><span>Visual study and implementation handoff</span><span>01 / 10</span></footer>
+</section>
+
+<section class="sheet" id="roles">
+  <div class="folio">PRODUCT ARCHITECTURE <span>ONE MEMORY / TWO WAYS TO USE IT</span></div>
+  <h2>Two roles in the same collection</h2>
+  <p class="lede">The visual language should explain the split already implemented in Archiver.</p>
+  <div class="role-grid">
+    <article class="role-card"><span class="role-number">01</span><div class="role-symbol" data-icon="book"></div><h3>Librarian</h3><p class="role-tag">Find it. Use it. Return to work.</p><p>The compact panel for retrieval from the visible library. Search comes first; the interface stays close to the keyboard.</p><dl><dt>Surface</dt><dd>480 × 720, bounded to the monitor</dd><dt>Scope</dt><dd>Library; full archive on explicit toggle</dd><dt>Primary action</dt><dd>Enter copies; Ctrl+Enter pastes</dd><dt>Visual rhythm</dt><dd>Compact header, strong selection, one footer</dd></dl></article>
+    <article class="role-card"><span class="role-number">02</span><div class="role-symbol" data-icon="archive"></div><h3>Archivist</h3><p class="role-tag">Browse it. Understand it. Keep it.</p><p>The full window for permanent history, provenance, organization, previews, terminal sessions, settings, and recovery.</p><dl><dt>Surface</dt><dd>1280 × 850 default; 900 × 400 minimum</dd><dt>Scope</dt><dd>Entire archive, including hidden library items</dd><dt>Primary actions</dt><dd>Inspect, copy, insert, organize, restore</dd><dt>Visual rhythm</dt><dd>Sidebar, results, readable detail pane</dd></dl></article>
+  </div>
+  <div class="scope-diagram"><span>Permanent archive</span><div>Visible library <small>A changing set of archived items</small></div><p>Clear library → change visibility<br>Explicit deletion → remove archived content</p></div>
+  <footer class="page-footer"><span>Archiver stays the app name. Librarian and Archivist stay the window names.</span><span>02 / 10</span></footer>
+</section>
+
+<section class="sheet" id="identity">
+  <div class="folio">IDENTITY <span>THE CATALOG CARD MARK</span></div>
+  <h2>A recognizable home for your history</h2>
+  <div class="identity-grid">
+    <div class="logo-field"><img src="assets/archiver-mark.svg" alt="Three tabbed catalog cards form the Archiver mark"><div class="wordmark">Archiver</div><span>PRIMARY LOCKUP</span></div>
+    <div><p class="lede">Three stepped catalog cards suggest a collection. A cut in the front card hints at an A.</p><p>The mark connects the library and the archive without making either window a separate brand. The product wordmark uses Instrument Serif; window labels use DM Sans.</p><div class="logo-variants"><div><img src="assets/archiver-app-icon.svg" alt="Archiver app icon"><small>App tile</small></div><div class="inverse-logo"><img src="assets/archiver-mark-reversed.svg" alt="Reversed Archiver mark"><small>Night / inverse</small></div><div><img src="assets/archiver-mark-micro.svg" alt="Simplified Archiver mark"><small>16–24 px micro</small></div></div><h4>Use with restraint</h4><p>Keep one tab-width of clear space. Use the primary mark at 32 px and above. Use the two-card micro silhouette below 32 px; verify 16, 20, 24, and 32 px at actual scale.</p><p>The SVGs are the editable reference. Rasterize platform icons from them; tray icons use a transparent, single-color mark.</p></div>
+  </div>
+  <div class="identity-rule"><b>Consistent family</b><span>Archiver / product</span><span>Librarian / retrieval</span><span>Archivist / preservation</span></div>
+  <footer class="page-footer"><span>Creative exploration translated into clean vector geometry. Optical review required before release.</span><span>03 / 10</span></footer>
+</section>
+
+<section class="sheet" id="system">
+  <div class="folio">DESIGN SYSTEM <span>PAPER / INK / SPRUCE / BRASS</span></div>
+  <h2>Warmth through color and typography</h2>
+  <div class="system-grid">
+    <div><p class="lede">Flat surfaces, fine rules, and useful contrast. Texture stays in brand artwork.</p><div class="palette"><div style="--swatch:#F5F1E8"><i></i><b>Paper</b><span>#F5F1E8</span></div><div style="--swatch:#252B28"><i></i><b>Ink</b><span>#252B28</span></div><div style="--swatch:#214E44"><i></i><b>Spruce</b><span>#214E44</span></div><div style="--swatch:#73572C"><i></i><b>Brass</b><span>#73572C</span></div></div><div class="palette night"><div style="--swatch:#191F1C"><i></i><b>Night paper</b><span>#191F1C</span></div><div style="--swatch:#EEECE3"><i></i><b>Chalk ink</b><span>#EEECE3</span></div><div style="--swatch:#A6C8B5"><i></i><b>Soft spruce</b><span>#A6C8B5</span></div><div style="--swatch:#D7BB87"><i></i><b>Soft brass</b><span>#D7BB87</span></div></div><h4>Semantic use</h4><p>Spruce identifies selection, actions, and focus. Brass distinguishes command content. State text and icons distinguish capture, warnings, and failures. Decorative rules use a quieter token than control borders.</p><p class="small">Color values and compatibility aliases are supplied in tokens.css. Contrast checks cover text on its intended surface, focus, controls, and selection.</p></div>
+    <div class="type-spec"><span class="eyebrow">EXISTING FONT FAMILIES, NEW HIERARCHY</span><div class="type-serif">Your archive</div><p>Instrument Serif · 40/44<br>Page headings and product wordmark</p><div class="type-sans">A useful record of your work.</div><p>DM Sans · 14/20 · 400–600<br>Controls, results, metadata, window names</p><div class="type-mono">git log --oneline -12</div><p>Consolas / system mono · 13/20<br>Commands, paths, exact stored content</p><div class="scale-strip"><b>4 / 8 / 12 / 16 / 24 / 32</b><span>Spacing rhythm</span><b>6 / 12 px</b><span>Control / panel radii</span></div><p>Serif never carries dense data. Metadata is 12 px minimum; Librarian footer uses 11 px. Avoid letter-spaced microcopy inside results.</p></div>
+  </div>
+  <footer class="page-footer"><span>Keep light/dark preferences. A new system-following preference belongs in a separate behavior change.</span><span>04 / 10</span></footer>
+</section>
+
+<section class="sheet" id="librarian">
+  <div class="folio">LIBRARIAN <span>COMPACT RETRIEVAL / LIGHT THEME</span></div>
+  <div class="quick-study-layout"><div class="quick-explanation"><h2>A small, useful<br>reading desk</h2><p class="lede">Search is the anchor. The selected record has a clear edge and a calm spruce surface.</p><ol class="annotations"><li><b>A quiet window signature</b><p>The Archiver mark and “Librarian” identify the panel. No artwork competes with retrieval.</p></li><li><b>Scope remains explicit</b><p>Library is the default. Archive mode visibly changes the search label and scope tab.</p></li><li><b>Rows carry real context</b><p>Source, age, command directory, repeat count, and failure state stay legible.</p></li><li><b>One useful footer</b><p>Keep current copy, paste, transform, navigation, and F1 behavior.</p></li></ol><div class="demo-controls"><button id="scope-toggle" aria-pressed="false">Preview archive scope</button><label for="quick-state">Preview state</label><select id="quick-state"><option value="results">Recent results</option><option value="empty">Empty library</option><option value="no-match">No search matches</option><option value="error">Search failed</option></select></div><p class="small">Interactive HTML offers sample scope and state controls.<br>480 × 720 frame shown at 82%.</p></div><div class="quick-scale"><div class="mock quick" data-theme="light" id="quick-light"></div></div></div>
+  <footer class="page-footer"><span>Search focuses immediately. Opening animation never gates keyboard input.</span><span>05 / 10</span></footer>
+</section>
+
+<section class="sheet" id="archivist">
+  <div class="folio">ARCHIVIST <span>PERMANENT HISTORY / LIGHT THEME</span></div>
+  <h2 class="compact-title">A clear workspace for the whole record</h2>
+  <div class="archive-scale"><div class="mock archivist" data-theme="light" id="archive-light"></div></div>
+  <footer class="page-footer"><span>1280 × 850 frame shown at 72%. Counts, content, and metadata are sample data.</span><span>06 / 10</span></footer>
+</section>
+
+<section class="sheet" id="night">
+  <div class="folio">NIGHT READING <span>THE SAME SYSTEM / A DIFFERENT SURFACE</span></div>
+  <h2>Dark mode should feel like the same place</h2>
+  <p class="lede">Deep green-black surfaces replace midnight blue. Selection, typography, and geometry stay consistent.</p>
+  <div class="night-mocks"><div class="night-quick-scale"><div class="mock quick" data-theme="dark" id="quick-dark"></div></div><div class="night-archive-scale"><div class="mock archivist" data-theme="dark" id="archive-dark"></div></div></div>
+  <div class="night-caption"><span>Readable metadata, without faded gray</span><span>Solid, legible surfaces without glow or blur</span><span>State labels remain visible in both themes</span></div>
+  <footer class="page-footer"><span>Theme preference persists through the existing archiver-theme setting.</span><span>07 / 10</span></footer>
+</section>
+
+<section class="sheet" id="components">
+  <div class="folio">COMPONENTS AND STATES <span>CONSISTENCY AT THE EDGES</span></div>
+  <h2>A common language for every tool</h2>
+  <div class="component-grid"><article class="specimen mock" data-theme="light"><h4>Record selection</h4><div class="spec-row"><span data-icon="file"></span><div>Project notes<small>Text · editor · 8m ago</small></div></div><div class="spec-row selected"><span data-icon="terminal"></span><div class="mono">npm run build<small>Command · PowerShell · 2m ago</small></div><span data-icon="chevron"></span></div><p>Use an inset leading rule and background. Focus gets a separate 2 px ring. Hover uses raised paper.</p></article><article class="specimen mock" data-theme="light"><h4>Actions and scope</h4><div class="action-samples"><button class="primary">Copy command</button><button class="secondary">Add to library</button></div><div class="scope-samples"><span class="scope-chip">Library</span><span class="scope-chip archive-scope">Archive</span><span class="badge"><span data-icon="pin"></span>Pinned</span></div><p>One filled primary per action group. Explicit verbs distinguish copy, paste, insert, and deletion.</p></article><article class="specimen mock" data-theme="light"><h4>Capture and shell states</h4><div class="state-line"><span class="status-dot"></span>Capture active</div><div class="state-line warning"><span data-icon="pause"></span>Capture paused</div><div class="state-line danger"><span data-icon="alert"></span>Capture interrupted</div><div class="state-line"><span data-icon="terminal"></span>PowerShell connected</div><p>Use the actual reported state. Unknown health stays unknown. Color never carries the message alone.</p></article><article class="specimen mock" data-theme="light"><h4>Dialogs and supporting tools</h4><div class="dialog-sample"><b>Transform and copy</b><span data-icon="close"></span><div class="dialog-option">Trim whitespace <kbd>Enter</kbd></div><div class="dialog-option">Format JSON</div><small>Original content stays archived.</small></div><p>The same treatment extends to snippets, filters, queues, OCR, diffs, import, backup, and settings.</p></article></div>
+  <p class="component-note">Destructive controls use text and a danger icon. Keep existing confirmations and recovery rules. Clearing the library must explicitly say it keeps archive history.</p>
+  <footer class="page-footer"><span>All specimens are proposed visual treatments of existing tools.</span><span>08 / 10</span></footer>
+</section>
+
+<section class="sheet" id="language">
+  <div class="folio">LANGUAGE AND FEEL <span>CALM / PRECISE / HUMAN</span></div>
+  <h2>The theme lives in the details</h2>
+  <div class="language-grid"><div><h4>Write like a helpful keeper of records</h4><table><thead><tr><th>Current space language</th><th>Proposed language</th></tr></thead><tbody><tr><td>Nothing lost in space.</td><td>Your archive</td></tr><tr><td>The recent orbit</td><td>Recent records</td></tr><tr><td>In your orbit.</td><td>Archive settings</td></tr><tr><td>No matches in this orbit</td><td>No matching records</td></tr><tr><td>Meaningful moments</td><td>Capture events</td></tr></tbody></table><h4>Empty library</h4><p><b>Your library is clear</b><br>Your history is still in the archive. Include archive results to find it here.</p><h4>Explicit deletion</h4><p><b>Delete from archive</b><br>Retain current confirmation and recovery behavior. Do not imply that clearing the library deletes records.</p></div><div><h4>Motifs</h4><p>Small catalog tabs, inset selection rules, and fine section dividers create an archival rhythm. Content feels organized without mimicking a physical filing cabinet.</p><h4>Motion</h4><p>100 ms color changes for hover and selection. Up to 140 ms opacity with 4 px vertical travel for the quick panel. Focus immediately. No staggered rows or repeating ambient animation.</p><h4>Accessibility and density</h4><p>Body text targets at least 4.5:1 contrast. Focus, control boundaries, and selected edges target at least 3:1. Use text plus icons for state. Keep scrollbars discoverable, focus visible, and reduced motion immediate.</p><h4>At smaller sizes</h4><p>Keep Librarian search and footer visible; scroll results locally. At 900 × 400, Archivist reduces decorative heading space and keeps reachable details/actions. At 125–200% scaling, essential actions cannot rely on hover.</p><h4>Use actual content as the hero</h4><p>Do not introduce fake accession numbers, people, room illustrations, or decorative shelf rows in working surfaces.</p></div></div>
+  <footer class="page-footer"><span>The theme changes expression. It preserves capture, storage, search, and retrieval contracts.</span><span>09 / 10</span></footer>
+</section>
+
+<section class="sheet" id="handoff">
+  <div class="folio">IMPLEMENTATION HANDOFF <span>DESIGN READY / MIGRATION PENDING</span></div>
+  <h2>A migration an agent can execute</h2>
+  <p class="lede">Start with the supplied implementation brief. Apply this study to the existing UI and verify both windows before expanding scope.</p>
+  <div class="handoff-grid"><div><ol class="migration-list"><li><b>Establish the theme contract</b><p>Map tokens.css into src/style.css. Preserve theme preference and cover all hardcoded surfaces, syntax colors, focus states, and dialogs.</p></li><li><b>Replace identity and copy</b><p>Remove Orbit marks, ring artwork, and space copy in src/main.tsx. Adopt catalog mark, window signatures, and clear library/archive language.</p></li><li><b>Restyle the two windows</b><p>Preserve 480 × 720 quick geometry and current shortcuts. Make Archivist results and details the visual priority.</p></li><li><b>Carry the system through every tool</b><p>Search, snippets, queues, timelines, OCR, diffs, settings, lifecycle, and command palette must use the same tokens.</p></li><li><b>Validate and align documentation</b><p>Frontend build and relevant UI checks. Rust checks only for Rust changes. Align feature catalog, STATUS, and ROADMAP with actual completion.</p></li></ol></div><div class="handoff-notes"><h4>Nonnegotiable behavior</h4><p>Preserve permanent archive history. Clearing the library changes visibility. Captures restore membership; command retries do not. Commands insert without execution.</p><p>Keep Ctrl+R shell search deferred. Experimental shell support and Windows-only OCR stay clearly labeled. New visuals do not imply new capabilities.</p><h4>Release discipline</h4><p>Generate icon assets for review, including monochrome tray output. Do not build or replace installers for this theme work.</p><h4>Files for the implementation agent</h4><p><a href="IMPLEMENTATION.md">IMPLEMENTATION.md</a><br><a href="tokens.css">tokens.css</a><br><a href="assets/archiver-mark.svg">Primary SVG mark</a><br><a href="assets/archiver-mark-micro.svg">Micro SVG mark</a><br><a href="PROMPTS.md">Creative asset provenance</a></p><p class="small">HANDOFF.md retains the feature queue: undo library clearing and OCR match previews first, then five extensions. This study does not reorder it or mark planned work complete.</p></div></div>
+  <footer class="page-footer"><span>Prepared for the Archiver workspace / October 12 2026</span><span>10 / 10</span></footer>
+</section>
+</main>
+<script src="study.js"></script>
+</body>
+</html>

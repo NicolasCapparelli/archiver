@@ -1,0 +1,47 @@
+[package]
+name = "archiver"
+version = "0.1.0"
+edition = "2021"
+default-run = "archiver"
+description = "A local memory for clipboard and command history"
+
+[lib]
+name = "archiver_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "archiver"
+path = "src/main.rs"
+
+[[bin]]
+name = "archiverctl"
+path = "src/cli.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-single-instance = "2"
+rusqlite = { version = "0.38", features = ["bundled", "backup"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+tauri-plugin-autostart = "2"
+tauri-plugin-updater = { version = "2", default-features = false, features = ["rustls-tls"] }
+url = "2"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_DataExchange", "Win32_System_Memory", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_Shell"] }
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1

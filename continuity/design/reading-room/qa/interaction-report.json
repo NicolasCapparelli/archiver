@@ -1,0 +1,16 @@
+{
+  "errors": [],
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "checks": [
+    "theme toggle",
+    "archive scope",
+    "empty library",
+    "include archive",
+    "search retry",
+    "detail selection",
+    "command filtering"
+  ]
+}
