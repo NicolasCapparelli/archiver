@@ -4,6 +4,8 @@ import { ChoiceDialog, type Choice } from "./choice-dialog";
 import { highlight, languages } from "./highlight-engine";
 import { transform, type Transformation } from "./text-tools";
 import { findText, nextMatch } from "./text-find";
+import { TextDiffTool } from "./text-diff-tool";
+import { TextExtractTool } from "./text-extract-tool";
 import { JsonExplorer } from "./json-explorer";
 import { ToolDialog } from "./tool-dialog";
 
@@ -56,6 +58,7 @@ export function ClipWorkbench({
   onToast: (message: string) => void;
   onSaveSnippet: (text: string) => void;
 }) {
+  const [utility, setUtility] = useState<"diff" | "extract">();
   const [jsonOpen, setJsonOpen] = useState(false);
   const [text, setText] = useState(draftText ?? initialText),
     [lang, setLang] = useState(startLang),
@@ -151,14 +154,16 @@ export function ClipWorkbench({
     } else void run(() => api.saveTextClip(text, asNew ? "archive" : "library"), asNew ? "Saved to the archive only" : "Saved to the library");
   }
   function onKeyDown(event: React.KeyboardEvent) {
-    if (picker || jsonOpen || event.nativeEvent.isComposing) return;
+    if (picker || jsonOpen || utility || event.nativeEvent.isComposing) return;
     const ctrl = event.ctrlKey || event.metaKey;
     const key = event.key.toLowerCase();
     const stop = () => {
       event.preventDefault();
       event.stopPropagation();
     };
-    if (ctrl && event.altKey && key === "j") {
+    if (ctrl && event.altKey && (key === "d" || key === "e")) {
+      stop(); setUtility(key === "d" ? "diff" : "extract");
+    } else if (ctrl && event.altKey && key === "j") {
       stop(); setJsonOpen(true);
     } else if (ctrl && !event.altKey && key === "f") {
       stop();
@@ -197,6 +202,8 @@ export function ClipWorkbench({
         ["Enter", "copy"],
         ["Ctrl F", "find"],
         ["Ctrl Alt J", "JSON explorer"],
+        ["Ctrl Alt D", "text diff"],
+        ["Ctrl Alt E", "extract text"],
         ["Ctrl T", "transform"],
         ["Ctrl S", snippet ? "edit snippet" : "overwrite clip"],
         ["Ctrl Shift S", "save as new"],
@@ -211,6 +218,8 @@ export function ClipWorkbench({
         ["Ctrl Enter", "copy"],
         ["Ctrl F", "find"],
         ["Ctrl Alt J", "JSON explorer"],
+        ["Ctrl Alt D", "text diff"],
+        ["Ctrl Alt E", "extract text"],
         ["Ctrl T", "transform"],
         ["Ctrl S", "save to library"],
         ["Ctrl Shift S", "archive only"],
@@ -274,6 +283,8 @@ export function ClipWorkbench({
           <button className="secondary" disabled={busy || !text} onClick={() => void copy()}>Copy</button>
           <button className="secondary" onClick={() => setFindOpen(true)}>Find</button>
           <button className="secondary" onClick={() => setJsonOpen(true)}>JSON explorer</button>
+          <button className="secondary" onClick={() => setUtility("diff")}>Text diff</button>
+          <button className="secondary" onClick={() => setUtility("extract")}>Text extractors</button>
           <button className="secondary" disabled={busy || !text} onClick={() => setPicker("transform")}>Transform</button>
           <button className="secondary" onClick={() => setPicker("language")}>Language</button>
           <button className="secondary" disabled={busy || !text.trim()} onClick={() => onSaveSnippet(text)}>{snippet ? "Edit snippet" : "Save as snippet"}</button>
@@ -288,6 +299,7 @@ export function ClipWorkbench({
           ))}
         </div>}
       </div>
+      {utility && <ToolDialog title={utility === "diff" ? "Text diff" : "Text extractors"} tall onClose={() => { setUtility(undefined); area.current?.focus(); }}>{utility === "diff" ? <TextDiffTool initialText={text} /> : <TextExtractTool initialText={text} />}</ToolDialog>}
       {jsonOpen && <ToolDialog title="JSON explorer" tall onClose={() => { setJsonOpen(false); area.current?.focus(); }}><JsonExplorer text={text} /></ToolDialog>}
       {picker === "transform" && (
         <ChoiceDialog

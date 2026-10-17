@@ -131,3 +131,9 @@ Text tools: **Ctrl+F** searches within Full clip, Paste Playground and Expanded 
 ## Region OCR, JSON and clip notes (R15)
 
 Select an image and use Region OCR in details or the command palette. Drag a rectangle or enter pixel bounds, then Recognize and Copy result. This Windows-only operation keeps the original image and full-image OCR intact. Select text for JSON explorer, or press Ctrl+Alt+J in Full clip/Paste Playground; expand containers and copy exact values or JSON Pointer paths. Invalid JSON reports a location. Edit clip notes from details or the palette; Save (Ctrl+S) stores separate searchable annotations, and saving an empty note removes it. Notes are not pasted with the clip.
+
+## Editable diff and extractors (R16)
+
+Open Text diff or Text extractors from the command palette or selected text details. Full clip/Paste Playground also provide buttons in Archivist and Ctrl+Alt+D / Ctrl+Alt+E in either window. The current text seeds the tool; editing it does not overwrite the clip or Playground. Escape returns to the editor. In diff, paste the other version on the right and choose Left or Right baseline; labels show additions/removals relative to that choice. Swap sides and Copy left/right are explicit actions; newline labels make CRLF/LF and missing final newline visible. Very large comparisons use approximate blocks and a bounded preview.
+
+Extractors offer URLs, emails, absolute paths or regex full matches. Quote paths containing spaces; no file is opened or checked. Keep duplicate removal on for unique exact values or turn it off to retain repeats. Custom patterns omit slash delimiters; flags i/m/u are optional. Extract previews results, Copy results writes newline-separated matches. Invalid or slow patterns report errors; Cancel stops work, changing input clears old results, and closing terminates the worker. Limits: 100,000 input characters, 2,000 results, 10,000 matches scanned and 1.5 seconds.

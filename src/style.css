@@ -26,7 +26,7 @@
   color-scheme: dark;
 }
 .tool-text { width: 100%; min-height: 180px; resize: vertical; padding: 10px; color: var(--ink); background: var(--panel); border: 1px solid var(--control-border); }
-.region-image { position: relative; width: 100%; touch-action: none; user-select: none; cursor: crosshair; overflow: hidden; }
+.region-image { flex-shrink: 0; position: relative; width: 100%; touch-action: none; user-select: none; cursor: crosshair; overflow: hidden; }
 .region-image img { display: block; width: 100%; height: 100%; }
 .region-selection { position: absolute; border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent-bg) 30%, transparent); pointer-events: none; }
 .region-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-block: 12px; }
@@ -1812,3 +1812,17 @@ input[type="checkbox"] { accent-color: var(--accent); }
 @media (max-width: 650px) {
   .archive-grid > .details { overflow: visible; }
 }
+
+/* R16 bounded text utilities, sharing semantic diff colors and Reading Room fields. */
+.text-tool-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.text-tool-columns label { min-width: 0; }
+.text-tool-columns input { width: 100%; }
+.text-tool-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0; }
+.diff-sides-scroll { max-height: 40vh; overflow: auto; border: 1px solid var(--line); }
+.diff-sides { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.diff-sides td, .diff-sides th { width: 50%; vertical-align: top; padding: 8px; border: 1px solid var(--line); }
+.diff-sides pre { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.diff-sides mark { color: inherit; background: var(--accent-bg); text-decoration: underline; text-decoration-thickness: 2px; }
+.diff-line-label { font-size: 11px; color: var(--muted); }
+.diff-gap { background: var(--panel); }
+@media (max-width: 560px) { .text-tool-columns { grid-template-columns: 1fr; } }

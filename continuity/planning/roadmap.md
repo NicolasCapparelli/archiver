@@ -6,15 +6,15 @@ Owns selected next work, sequence and acceptance. Possibilities without a commit
 
 ## Current user-selected priorities (2026-10-17 revision)
 
-The user's implementation request promotes five tools above the previous 15-feature list, preserving both orders. Implement these five now and commit after each two or three implementations. The first three are implemented as R15; editable text diff and extractors follow as the second batch. The remaining backlog resumes at Q3. This supersedes earlier Q3-first sequences; stable Q IDs and acceptance stay available. [Original revision and proposal definitions](studies/feature-priorities-2026-10-17.md).
+The user's implementation request promotes five tools above the previous 15-feature list, preserving both orders. Implement these five now and commit after each two or three implementations. All five are implemented: the first three in R15 (commit `2b616d5`), and editable text diff/extractors in R16 as the second batch. The remaining backlog resumes at Q3. This supersedes earlier Q3-first sequences; stable Q IDs and acceptance stay available. [Original revision and proposal definitions](studies/feature-priorities-2026-10-17.md).
 
 | Priority | Feature | State / reference |
 | --- | --- | --- |
 | 1 | Region OCR | N16; implemented R15, native H21 pending |
 | 2 | JSON explorer, including Paste Playground | N14; implemented R15, native H21 pending |
 | 3 | Notes on archived clips | N20; implemented R15, native H21 pending |
-| 4 | Text diff tool with editable left/right inputs and highlighted differences | R16; next implementation |
-| 5 | Text extractors | N18; selected, not yet implemented |
+| 4 | Text diff tool with editable left/right inputs and highlighted differences | R16; implemented, native H22 pending |
+| 5 | Text extractors | N18; implemented R16, native H22 pending |
 | 6 | Portable import and verified restore | Q3 |
 | 7 | Diagnostics and storage/capture health | Q7, I8, I18 |
 | 8 | Clipboard compatibility improvements | I10, L5 |
@@ -35,11 +35,16 @@ N references retain their scope definitions in the [original review](studies/fea
 
 ## Implemented, awaiting human verification
 
+### R16: Editable text diff and text extractors
+- Implemented 2026-10-17 as the second batch. Palette/selected text details and Full clip/Paste Playground expose both tools (Ctrl+Alt+D diff, Ctrl+Alt+E extract in workbench). Diff supports editable physical left/right sides, baseline reversal, aligned changes and Unicode-safe changed spans; line-ending labels, 100,000-character side limits, existing bounded/coarse algorithm and first 1,000 preview rows.
+- Extract HTTP(S) URLs, email addresses, absolute Windows/Unix file paths (quote spaces) or custom regex full matches. Preserve source order, optionally remove exact duplicates; explicit copy. Independent worker has 1.5-second deadline, cancellation/unmount termination, 100,000-character inputs, 2,000 results/10,000 scan ceiling; errors/no-match/limits visible. No path existence check or archive mutation during inspection.
+- Frontend build/typecheck and 25 UI helpers pass, including production worker adapted to worker_threads for invalid pattern/termination checks. R15 native check/tests and actual cropped-image Windows OCR passed. Human H21/H22 remain pending; no computer UI control or installer. Resume Q3 after these five.
+
 ### R15: Region OCR, JSON explorer and archive notes
 - Implemented 2026-10-17, first three tools in the user's promoted queue. Region OCR uses normalized backend-validated rectangles mapped from original pixels, original image decoding limits, shared OCR busy guard and existing Windows worker. Result is ephemeral and explicitly copied; no full-image OCR/index mutation.
 - JSON explorer appears in the palette/details and in Full clip/Paste Playground through Ctrl+Alt+J (Archivist button too). Strict parsing, exact source slices for values, escaped JSON Pointers and expandable rows; one million input characters and 2,000 tree rows. Large numeric literals are preserved.
 - Clip notes are separate metadata, editable via details/palette with Ctrl+S. Literal/fuzzy search, restart, export, backup and deletion recovery preserve them without modifying payloads, revisions or identity; empty saves remove the note.
-- Native visual/interaction check H21 pending; no UI automation or installer. Editable diff and extractors are next; no work on Q3 this batch.
+- Native visual/interaction check H21 pending; no UI automation or installer. The following R16 batch completes the five promoted tools; Q3 remains the next backlog item.
 
 
 ### R14: Collapsed snippet defaults, category focus and recent batch paste

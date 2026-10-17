@@ -252,6 +252,8 @@ const shortcuts = [
     "Ctrl + Shift + N",
     "Paste Playground: scratch text with transforms, saved to the library or archive"
   ],
+  ["Text and snippets", "Ctrl + Alt + D (Full clip / Playground)", "Editable left/right text diff with a selectable baseline"],
+  ["Text and snippets", "Ctrl + Alt + E (Full clip / Playground)", "Extract URLs, emails, file paths or custom regex matches"],
   ["Text and snippets", "Ctrl + Alt + J (Full clip / Playground)", "Explore JSON values and copy exact values or JSON Pointer paths"],
   ["Text and snippets", "Ctrl + Shift + J", "Emoji catalog: search names, categories or symbols; arrows select, Enter / Shift + Enter copy, Ctrl + Enter / Ctrl + Shift + Enter paste; Ctrl + K searches"],
   [

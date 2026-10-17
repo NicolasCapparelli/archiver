@@ -32,6 +32,8 @@ import { listen } from "@tauri-apps/api/event";
 import * as api from "./api";
 import type { Item } from "./api";
 import { ImageThumbnail, ImageDetail } from "./image-preview";
+import { TextDiffTool } from "./text-diff-tool";
+import { TextExtractTool } from "./text-extract-tool";
 import { RegionOcr } from "./region-ocr";
 import { JsonExplorer } from "./json-explorer";
 import { ClipNotes } from "./clip-notes";
@@ -184,6 +186,7 @@ function App() {
   >();
   const [regionId, setRegionId] = useState<string>();
   const [noteId, setNoteId] = useState<string>();
+  const [textUtility, setTextUtility] = useState<{ kind: "diff" | "extract"; text: string }>();
   const [jsonText, setJsonText] = useState<string>();
   const [transformOpen, setTransformOpen] = useState(false);
   const [clipView, setClipView] = useState<null | {
@@ -356,7 +359,7 @@ function App() {
           ++generation.current;
           setPreferences(prefs);
           setClipView(null); setSnippetDraft(undefined); setRenamePin(undefined); setToolDialog(undefined); setTransformOpen(false); setTemplateDialog(false); setPalette(false); setShortcutsOpen(false); setOrganizationOpen(false); setConfirmDelete(false);
-          setEmojiOpen(false);
+          setEmojiOpen(false); setRegionId(undefined); setNoteId(undefined); setJsonText(undefined); setTextUtility(undefined);
           let saved: typeof browsingState.current | null = null;
           if (prefs.librarianStateMemory) { try { saved = JSON.parse(localStorage.getItem("archiver-librarian-state") || "null"); } catch { /* A damaged browsing cache must not block opening. */ } }
           if (saved && filters.some(f => f.id === saved!.filter) && typeof saved.query === "string" && (saved.collapsedSnippets === null || Array.isArray(saved.collapsedSnippets))) {
@@ -1011,6 +1014,7 @@ function App() {
     onExpand={draft => setClipView({ ...clipView, expanded: true, draft })}
     onSaveSnippet={text => { const item = items.find(item => item.id === clipView.item?.id); setClipView(null); setSnippetDraft({ id: item?.name ? item.id : undefined, name: item?.name || "", note: item?.note, kind: clipView.item?.kind === "command" ? "command" : "text", text }); }} onToast={setToast} />;
   const dialogs = (<>
+    {textUtility && <ToolDialog title={textUtility.kind === "diff" ? "Text diff" : "Text extractors"} tall onClose={() => setTextUtility(undefined)}>{textUtility.kind === "diff" ? <TextDiffTool initialText={textUtility.text} /> : <TextExtractTool initialText={textUtility.text} />}</ToolDialog>}
     {regionId && <RegionOcr key={regionId} id={regionId} onClose={() => setRegionId(undefined)} />}
     {noteId && <ClipNotes key={noteId} id={noteId} onClose={() => setNoteId(undefined)} onSaved={() => { setToast("Note saved"); void refresh(); }} />}
     {jsonText !== undefined && <ToolDialog title="JSON explorer" onClose={() => setJsonText(undefined)} tall><JsonExplorer text={jsonText} /></ToolDialog>}
@@ -1024,6 +1028,8 @@ function App() {
       { label: "All shortcuts · F1", run: () => setShortcutsOpen(true) },
       ...(active?.kind === "image" ? [{ label: "Region OCR · recognize selected image area", run: () => setRegionId(active.id) }] : []),
       ...(active && !active.name ? [{ label: "Edit clip notes", run: () => setNoteId(active.id) }] : []),
+      { label: "Text diff · editable left and right", run: () => setTextUtility({ kind: "diff", text: prepared ?? active?.text ?? "" }) },
+      { label: "Text extractors · URLs, emails, paths and regex", run: () => setTextUtility({ kind: "extract", text: prepared ?? active?.text ?? "" }) },
       { label: "JSON explorer · selected text", run: () => setJsonText(prepared ?? active?.text ?? "") },
       { label: "Emoji catalog · Ctrl Shift J", run: () => setEmojiOpen(true) },
       ...Array.from({ length: 9 }, (_, index) => ({ label: `Paste last ${index + 1} clips · Ctrl Win ${index + 1}`, run: () => void action(() => api.pasteRecent(index + 1), "Recent clips pasted") })),
@@ -1516,6 +1522,7 @@ function App() {
                       {!active.name && <button className="secondary" onClick={() => setNoteId(active.id)}>Edit clip notes</button>}
                       {active.kind === "image" && <button className="secondary" onClick={() => setRegionId(active.id)}>Region OCR</button>}
                       {!["image", "files"].includes(active.kind) && <button className="secondary" onClick={() => setJsonText(prepared ?? active.text)}>JSON explorer</button>}
+                      {!["image", "files"].includes(active.kind) && <><button className="secondary" onClick={() => setTextUtility({ kind: "diff", text: prepared ?? active.text })}>Text diff</button><button className="secondary" onClick={() => setTextUtility({ kind: "extract", text: prepared ?? active.text })}>Text extractors</button></>}
                       {!active.name && (
                         <button
                           className="secondary"

@@ -53,3 +53,7 @@ Primitives live in `src/style.css` and the React components: `button` (reset sty
 ## R15 tool extensions
 
 Region OCR uses an accent rectangle over a proportional image with equivalent labeled pixel-coordinate controls. JSON uses bounded, wrapping indented rows and explicit expand/copy controls. Notes use the shared text field and ToolDialog. Nested dialogs restore the previous focus. Existing semantic colors, flat surfaces and keyboard focus remain authoritative. Frontend compilation passes; native layout, pointer selection and focus checks remain pending H21.
+
+## R16 text utility extensions
+
+Editable diff and extractors reuse ToolDialog, shared text fields and semantic diff backgrounds. Diff uses a two-column table with textual change/newline labels, underlined changed spans, wrapping lines and bounded scrolling; editor columns stack below 560px. Extractors use labeled controls and explicit extraction/copy actions with live result/error status. Librarian workbench entry points are shortcuts; Archivist also exposes buttons. No new shadows or color tokens. Build verified; both-theme native layout, WebView worker and nested keyboard focus await H22.
