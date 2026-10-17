@@ -53,7 +53,7 @@ FTS and the fuzzy index are derived and rebuilt on migration. Fuzzy indexing is 
 - Times are Unix milliseconds (`events.first_seen/last_seen`, search filters `from`/`until`).
 
 ## Export and backup
-`export_jsonl` writes a consistent-snapshot JSONL with SHA-256 manifest; `backup_verified` produces a verified SQLite copy; neither overwrites existing files (test `backup_and_export_are_verified_and_do_not_overwrite` in `archive_io.rs`). No import/restore path exists yet (queued). Settings are not included.
+`export_jsonl` writes a consistent-snapshot JSONL with SHA-256 manifest; `backup_verified` produces a verified SQLite copy; neither overwrites existing files (test `backup_and_export_are_verified_and_do_not_overwrite` in `archive_io.rs`). Manual import/restore is implemented in R17; settings are not included.
 
 ## Change and compatibility constraints
 
@@ -93,3 +93,12 @@ Browsing collapse cache now uses `null` for default-all-collapsed (including fut
 ## Ephemeral text utilities (R16)
 
 `diff-sides.ts` maps bounded `text-diff.ts` output back to physical sides regardless of baseline, retaining exact strings and line endings. `changedSpan` uses Unicode code points for shared edges. `text-extract.ts` validates bounded input/pattern/flags and returns ordered full-match strings; presets handle URL sentence punctuation, ASCII email patterns and absolute quoted paths. No arbitrary expression evaluation: regex executes inside `extract-worker.ts`, which the UI terminates on deadline/cancel/input change/unmount. Exact duplicate removal is case-sensitive. Results are temporary text; explicit clipboard copy follows existing capture policy. These tools add no schema or persistent draft storage.
+
+
+## Import and logical replacement (R17)
+
+archive_import.rs loads checksum-verified bounded JSONL or closed SQLite into an in-memory Store with trusted schema. Imported SQL never executes. Columns/types, supported versions, fingerprints, foreign/polymorphic references, saved-search options and independent recovery snapshots are validated. Legacy titles/notes default empty; missing legacy library tables seed incoming items. Unsupported schemas fail. A private copy rehearses merge/index rebuild without changing the live archive; a UUID token retains validated staging data and destination data_version/total_changes stamp. New preview replaces the pending token; intervening mutations require another preview.
+
+Merge maps fingerprints to local IDs, remaps references/conflicting IDs, keeps local metadata and note/OCR/link/library entries, unions labels and imports occurrences/snippets. Exact duplicates skip; conflicting snippet names/occurrence identities abort. Portable merge omits full-backup-only state. SQLite replacement restores known logical tables plus saved searches, trash, revisions and clear-library snapshot. Mandatory verified backup/manifest precedes replacement; one immediate transaction supplies rollback/external-writer serialization. Logical replacement keeps SQLite handles valid rather than replacing files. App mutex + OCR/preview guards coordinate workers and queue captures; derived FTS/fuzzy indexes/thumbnails rebuild. Preferences/profiles/browsing caches are excluded. Limits: 256 MiB, 250,000 rows, 32 MiB JSONL lines.
+
+Shell JSON adds protocolVersion (1; missing defaults to legacy 0). Readiness marks reports older than two minutes, invalid/future timestamps and protocol mismatch; reports are prompt-driven, not heartbeats. Stale/mismatched insertion rejects without input. Diagnostics query state/storage. Repair stages embedded existing installer/adapters and invokes -SkipCmd only after approval. Safe summary copying excludes content/paths/session IDs/error details.

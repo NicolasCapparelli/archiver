@@ -13,17 +13,17 @@ use std::{
 };
 #[derive(Serialize, Deserialize)]
 pub struct Snapshot {
-    version: u32,
-    tables: BTreeMap<String, Table>,
+    pub(crate) version: u32,
+    pub(crate) tables: BTreeMap<String, Table>,
 }
 #[derive(Serialize, Deserialize)]
-struct Table {
-    columns: Vec<String>,
-    rows: Vec<Vec<serde_json::Value>>,
+pub(crate) struct Table {
+    pub(crate) columns: Vec<String>,
+    pub(crate) rows: Vec<Vec<serde_json::Value>>,
 }
 // library_clear_snapshot is local visibility-undo state: full SQLite backups include it,
 // portable exports and per-item deletion recovery intentionally do not.
-const TABLES: [&str; 10] = [
+pub(crate) const TABLES: [&str; 10] = [
     "items",
     "events",
     "representations",

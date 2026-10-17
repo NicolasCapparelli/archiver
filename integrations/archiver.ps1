@@ -22,7 +22,7 @@ $global:ArchiverInsertionEnabled = -not $global:ArchiverPreviousInsertBinding
 function global:Update-ArchiverSession {
     param([bool]$Ready = $true)
     $data = @{ session = $global:ArchiverSession; source = "PowerShell $($PSVersionTable.PSVersion)"; pid = $PID;
-        directory = (Get-Location).Path; ready = $Ready; insertion = $global:ArchiverInsertionEnabled; updatedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
+        protocolVersion = 1; directory = (Get-Location).Path; ready = $Ready; insertion = $global:ArchiverInsertionEnabled; updatedAt = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds() }
     $path = Join-Path $global:ArchiverSessionDirectory "$($global:ArchiverSession).json"
     try {
         $pending = "$path.pending"

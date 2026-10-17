@@ -22,7 +22,7 @@ local insertion = false
 local function update_session(ready)
     local file = io.open(sessions .. '\\' .. session .. '.json', 'wb')
     if not file then return end
-    file:write('{"session":' .. json_string(session) .. ',"source":"CMD (Clink)","pid":' .. tostring(os.getpid()) .. ',"directory":' .. json_string(os.getcwd()) .. ',"ready":' .. tostring(ready) .. ',"insertion":' .. tostring(insertion) .. ',"updatedAt":' .. tostring(os.time()*1000) .. '}')
+    file:write('{"protocolVersion":1,"session":' .. json_string(session) .. ',"source":"CMD (Clink)","pid":' .. tostring(os.getpid()) .. ',"directory":' .. json_string(os.getcwd()) .. ',"ready":' .. tostring(ready) .. ',"insertion":' .. tostring(insertion) .. ',"updatedAt":' .. tostring(os.time()*1000) .. '}')
     file:close()
 end
 function archiver_insert(rl_buffer)

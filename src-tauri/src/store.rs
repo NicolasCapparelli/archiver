@@ -1247,7 +1247,7 @@ mod tests {
     }
 }
 
-fn capture_fingerprint(capture: &Capture) -> String {
+pub(crate) fn capture_fingerprint(capture: &Capture) -> String {
     let mut hash = Sha256::new();
     hash.update(capture.kind.as_bytes());
     hash.update([0]);

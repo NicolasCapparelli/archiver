@@ -6,7 +6,7 @@ Owns selected next work, sequence and acceptance. Possibilities without a commit
 
 ## Current user-selected priorities (2026-10-17 revision)
 
-The user's implementation request promotes five tools above the previous 15-feature list, preserving both orders. Implement these five now and commit after each two or three implementations. All five are implemented: the first three in R15 (commit `2b616d5`), and editable text diff/extractors in R16 as the second batch. The remaining backlog resumes at Q3. This supersedes earlier Q3-first sequences; stable Q IDs and acceptance stay available. [Original revision and proposal definitions](studies/feature-priorities-2026-10-17.md).
+The user's implementation request promotes five tools above the previous 15-feature list, preserving both orders. Implement these five now and commit after each two or three implementations. All five are implemented: the first three in R15 (commit `2b616d5`), and editable text diff/extractors in R16 as the second batch. Q3 import/restore and Q7 diagnostics are implemented in R17. Clipboard compatibility (priority 8) is next. This supersedes earlier Q3-first sequences; stable Q IDs and acceptance stay available. [Original revision and proposal definitions](studies/feature-priorities-2026-10-17.md).
 
 | Priority | Feature | State / reference |
 | --- | --- | --- |
@@ -15,8 +15,8 @@ The user's implementation request promotes five tools above the previous 15-feat
 | 3 | Notes on archived clips | N20; implemented R15, native H21 pending |
 | 4 | Text diff tool with editable left/right inputs and highlighted differences | R16; implemented, native H22 pending |
 | 5 | Text extractors | N18; implemented R16, native H22 pending |
-| 6 | Portable import and verified restore | Q3 |
-| 7 | Diagnostics and storage/capture health | Q7, I8, I18 |
+| 6 | Portable import and verified restore | Q3; implemented R17, native H23 pending |
+| 7 | Diagnostics and storage/capture health | Q7, I8, I18; implemented R17, native H24 pending |
 | 8 | Clipboard compatibility improvements | I10, L5 |
 | 9 | Typed search filters and proper directory matching | I5, I6 |
 | 10 | Playground draft recovery | N2 |
@@ -34,6 +34,12 @@ The user's implementation request promotes five tools above the previous 15-feat
 N references retain their scope definitions in the [original review](studies/feature-review-2026-10-17.md). Omitted features are outside the active selection: scheduled backups (Q4), snippet version history (N1), timed pause (N5), selected-record bundles (N7), related-variant comparison (N10), saved-search slots (N11) and encryption (I15). Preserve them as provenance; omission does not establish permanent rejection. N14, N16, N18 and N20 are now selected by the user; N13, N15, N17 and N19 remain unselected.
 
 ## Implemented, awaiting human verification
+
+### R17: Portable import/verified restore and capture/storage diagnostics
+- Implemented 2026-10-17 as the next two-feature commit batch, completing Q3 and Q7 in source. Settings validates/checksums portable JSONL or closed SQLite backups into a trusted temporary schema, rehearses a merge privately, then uses a token-bound preview and one immediate transaction. Repeated imports are idempotent; IDs remap to matching fingerprints, destination annotations/visibility win, conflicting snippets/events stop the merge. Unicode, original representations, occurrences/results, snippets, labels, OCR and new-item library scope survive.
+- SQLite replacement requires explicit UI approval and a new verified pre-restore backup. Restores known logical archive tables, recovery/revisions, saved searches/empty groups and clear-library undo; derived indexes/caches rebuild. Preferences, profiles and browsing caches remain separate. Deliberate implementation choice: logical transactional replacement keeps SQLite handles open and valid instead of renaming database files; the store mutex, OCR guard and preview-worker guard coordinate workers, and external writers serialize. Stale previews reject and transaction errors roll back. Older exports receive title/note/library defaults. Bounds: 256 MiB / 250,000 rows / 32 MiB JSONL records; checksum required. No automatic restore.
+- Settings health shows capture/clipboard state, last errors, storage quick check/pages/database/WAL, pending spool and unreadable reports; safe copy excludes content/paths/IDs/error details. Versioned shell reports distinguish old reports, busy prompts, protocol mismatch, insertion and platform limits. Windows PowerShell repair explicitly stages/reviews/runs the existing installer with approval, -SkipCmd and profile backups. Clink stays manual; Unix/WSL experimental. Tests never change real profiles.
+- Automated checks recorded in the implementation log. Native import/restore UI H23 and health/repair H24 remain pending. Next selected work is priority 8, clipboard compatibility (I10/L5).
 
 ### R16: Editable text diff and text extractors
 - Implemented 2026-10-17 as the second batch. Palette/selected text details and Full clip/Paste Playground expose both tools (Ctrl+Alt+D diff, Ctrl+Alt+E extract in workbench). Diff supports editable physical left/right sides, baseline reversal, aligned changes and Unicode-safe changed spans; line-ending labels, 100,000-character side limits, existing bounded/coarse algorithm and first 1,000 preview rows.
@@ -109,7 +115,7 @@ State of R1-R4 (the user's 2026-10-13 request): **implemented in source**; build
 <a id="next-agent-queue-q1q7"></a>
 ## Next-agent queue (Q1-Q7)
 
-Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9-H13. Q3 and Q7 remain **selected, not implemented**; Q4 is outside the current selection. I20 system appearance is also implemented. The promoted five-tool sequence above takes precedence; after it, Q3 then Q7 resume. Stable Q IDs and acceptance are retained from the 2026-10-12 HANDOFF.md; their original numeric order no longer defines priority. Preserve everything listed in [behavior to preserve](../developer/implemented-features.md#behavior-to-preserve-from-the-2026-10-12-handoff). Delivery expectations for each: report actual test results and limitations; build no-bundle executables when useful (`npm run launch`), avoid installer churn; update the feature catalog and documents with completed behavior; leave unfinished tasks here; give the user a short next-step list. Do not enable startup, modify real shell profiles or delete real user history to test; use isolated data.
+Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9-H13. Q3 and Q7 are **implemented in source 2026-10-17**, native checks pending H23/H24; Q4 is outside the current selection. I20 system appearance is also implemented. The promoted five-tool sequence above takes precedence; Q3 and Q7 are now implemented; continue from priority 8 (clipboard compatibility). Stable Q IDs and acceptance are retained from the 2026-10-12 HANDOFF.md; their original numeric order no longer defines priority. Preserve everything listed in [behavior to preserve](../developer/implemented-features.md#behavior-to-preserve-from-the-2026-10-12-handoff). Delivery expectations for each: report actual test results and limitations; build no-bundle executables when useful (`npm run launch`), avoid installer churn; update the feature catalog and documents with completed behavior; leave unfinished tasks here; give the user a short next-step list. Do not enable startup, modify real shell profiles or delete real user history to test; use isolated data.
 
 ### Q1: Undo library clearing
 - State: **implemented 2026-10-13**. `library_clear_snapshot` stores the latest nonempty clear transactionally, survives restart and merges into current membership. Deleted IDs cascade out; repeat undo is idempotent. F1, palette, Ctrl+Shift+Z and the post-clear Undo banner expose it. CLI `library undo-clear` and stdio `undo_library_clear` share the behavior. Full SQLite backups preserve the snapshot; portable JSONL exports and individual deletion recovery intentionally omit it (visibility undo belongs to the source archive). Isolated Rust/CLI tests pass; native H10 pending.
@@ -124,7 +130,8 @@ Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9
 - Acceptance: a screenshot whose filename does not match but recognized text does has a useful excerpt; matching text is escaped; fuzzy behavior documented; list/search stays bounded; browsing never changes scan timestamps.
 
 ### Q3: Portable archive import and verified backup restore
-- Extend existing JSONL export/SQLite verification into a usable import/restore flow. Validate schema, checksums, limits, references and preview counts before mutations. Portable import merges transactionally and idempotently and preserves Unicode, representations, occurrences, snippets, labels, OCR and library scopes. Full backup replacement needs a concrete preview and user approval, a pre-restore backup, closed DB handles/worker coordination and rollback. `settings.json` is outside the database: state explicitly what is restored. Test corrupt files, repeat imports, older supported formats, partial failure and active capture. (Currently export-import and automatic restore are not implemented.)
+- State: **implemented 2026-10-17 R17**; native H23 pending. Acceptance retained below; logical transaction/worker coordination replaces file-handle teardown.
+- Extend existing JSONL export/SQLite verification into a usable import/restore flow. Validate schema, checksums, limits, references and preview counts before mutations. Portable import merges transactionally and idempotently and preserves Unicode, representations, occurrences, snippets, labels, OCR and library scopes. Full backup replacement needs a concrete preview and user approval, a pre-restore backup, closed DB handles/worker coordination and rollback. `settings.json` is outside the database: state explicitly what is restored. Test corrupt files, repeat imports, older supported formats, partial failure and active capture. (Implemented in R17 above; no scheduled/automatic restore is enabled.)
 
 ### Q4: Opt-in scheduled verified backups
 - State: outside the active selection after the user's 2026-10-17 edited list; acceptance retained for possible reconsideration.
@@ -139,6 +146,7 @@ Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9
 - Local measurements, Windows x64, AMD Ryzen 7 7800X3D, Rust debug build, in-memory SQLite, single runs: 10,000 synthetic command captures/indexing 2.263 s; first 50 literal results 59.70 ms, broad fuzzy 105.19 ms. Sparse-library regression two page queries together 10.67 ms (first result plus empty next page). Not production guarantees or p95 measurements; disk is not exercised. Native H13 pending.
 
 ### Q7: Actionable integration health diagnostics
+- State: **implemented 2026-10-17 R17**; native H24 pending. Explicit in-app repair covers Windows PowerShell; CMD/Clink and Unix instructions remain manual. Acceptance retained below.
 - Extend connected-shell indicators with stale heartbeat, capture readiness, insertion capability, adapter/version mismatch and a readable last error. Provide safe copyable setup/repair instructions and an explicit repair action through existing installers where applicable. Distinguish PowerShell, CMD/Clink, Bash/Zsh/Fish and WSL limitations. Preserve profile backups/idempotency, no unsolicited real-profile edits, and insertion without Enter. Exercise isolated profiles and stale/unsupported sessions.
 
 <a id="later-platform-validation-and-release-backlog"></a>

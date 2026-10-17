@@ -1826,3 +1826,6 @@ input[type="checkbox"] { accent-color: var(--accent); }
 .diff-line-label { font-size: 11px; color: var(--muted); }
 .diff-gap { background: var(--panel); }
 @media (max-width: 560px) { .text-tool-columns { grid-template-columns: 1fr; } }
+
+.diagnostic-code { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+.archive-import-preview { border-inline-start: 2px solid var(--accent); padding-inline-start: 12px; margin-block-start: 12px; }

@@ -6,11 +6,11 @@ This is the index for future work. [Roadmap](roadmap.md) owns selected work, seq
 
 The root ROADMAP.md and HANDOFF.md were migrated here on 2026-10-13 and removed. Implemented-pending-verification work (R1-R4), the queued tasks with full acceptance (Q1-Q7) and the platform/validation/release backlog (L1-L10) are in the [roadmap](roadmap.md); possibilities from the old design draft and design study are in [ideas](ideas.md). The historical product design draft is [history/product-design-draft-0.2.md](../history/product-design-draft-0.2.md); the Reading Room visual study is [design/reading-room](../design/reading-room/README.md). AGENTS.md remains the agent rule source.
 
-Q1/Q2/Q5/Q6 are implemented in source; Q3 portable import/verified restore is the next remaining item in the [Q1-Q7 queue](roadmap.md#next-agent-queue-q1q7), followed by Q7 and the rest of the original 15 user-selected priorities; Q4 is outside the revised selection. R6/R7 user follow-ups are implemented; native checks remain pending. I20 Follow system appearance was selected and implemented in R7.
+Q1/Q2/Q3/Q5/Q6/Q7 are implemented in source. The [20-priority list](roadmap.md#current-user-selected-priorities-2026-10-17-revision) now resumes at priority 8, clipboard compatibility, then typed search/directory matching; Q4 is outside the revised selection. R6/R7 user follow-ups are implemented; native checks remain pending. I20 Follow system appearance was selected and implemented in R7.
 
 ## Studies
 
-The later implementation request selects N16, N14, N20, editable text diff and N18 in that order; the roadmap records implementation state and now has 20 priorities. All five are implemented in R15–R16; H21/H22 are pending, Q3 resumes next. Earlier studies preserve provenance.
+The later implementation request selects N16, N14, N20, editable text diff and N18 in that order; the roadmap records implementation state and now has 20 priorities. All five are implemented in R15–R16; H21/H22 are pending. R17 also completes Q3/Q7 with H23/H24 pending; clipboard compatibility is next. Earlier studies preserve provenance.
 
 2026-10-17: [Desktop feature review](studies/feature-review-2026-10-17.md) evaluates all I1–I30 and Q/L work, ranks surviving ideas and adds twelve new proposals. The later user revision below supersedes this ranking; the study retains historical dispositions and scope definitions.
 

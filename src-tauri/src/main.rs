@@ -30,6 +30,7 @@ struct State {
     ocr_cancel: Arc<AtomicBool>,
     ocr_error: Arc<Mutex<Option<String>>>,
     update: Mutex<Option<tauri_plugin_updater::Update>>,
+    pending_import: Arc<Mutex<Option<archiver_core::archive_import::Prepared>>>,
 }
 #[tauri::command]
 fn ocr_status(state: tauri::State<State>) -> Result<serde_json::Value, String> {
@@ -270,6 +271,7 @@ fn write_policy(path: &std::path::Path, paused: bool) -> Result<(), String> {
     std::fs::write(&temporary, bytes).map_err(|e| e.to_string())?;
     std::fs::rename(temporary, path).map_err(|e| e.to_string())
 }
+fn now() -> i64 {std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() as i64}
 fn lock<T>(mutex: &Mutex<T>) -> Result<std::sync::MutexGuard<'_, T>, String> {
     mutex.lock().map_err(|_| "Archive state unavailable".into())
 }
@@ -555,6 +557,56 @@ fn undo_delete(
     app.emit("archive-changed", ()).map_err(|e| e.to_string())
 }
 #[tauri::command]
+async fn preview_archive_import(
+    state: tauri::State<'_, State>,
+    path: String,
+    replacement: bool,
+    backup_path: Option<String>,
+) -> Result<archiver_core::archive_import::ImportPreview, String> {
+    let store = state.store.clone();
+    let pending = state.pending_import.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let mut pending = lock(&pending)?;
+        *pending = None;
+        let prepared =
+            lock(&store)?.prepare_import(std::path::Path::new(&path), replacement, backup_path)?;
+        let preview = prepared.preview.clone();
+        *pending = Some(prepared);
+        Ok(preview)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+#[tauri::command]
+async fn apply_archive_import(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, State>,
+    token: String,
+    approved: bool,
+) -> Result<archiver_core::archive_import::ImportPreview, String> {
+    let store = state.store.clone();
+    let pending = state.pending_import.clone();
+    let ocr = state.ocr_running.clone();
+    let preview_worker = state.preview_worker.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        // Exclude results from OCR/thumbnail workers that started against the old archive.
+        ocr.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+            .map_err(|_| "Wait for OCR to finish, then try again")?;
+        let _ocr = OcrJob(ocr);
+        let _previews = lock(&preview_worker)?;
+        let mut pending = lock(&pending)?;
+        if pending.as_ref().is_none_or(|p| p.preview.token != token) {
+            return Err("Import preview expired; check the archive again".into());
+        }
+        let prepared = pending.take().ok_or("Import preview expired")?;
+        let report = lock(&store)?.apply_import(prepared, approved)?;
+        app.emit("archive-changed", ()).map_err(|e| e.to_string())?;
+        Ok(report)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+#[tauri::command]
 async fn export_archive(
     state: tauri::State<'_, State>,
     path: String,
@@ -835,6 +887,42 @@ fn shell_sessions(state: tauri::State<State>) -> Vec<archiver_core::shell::Sessi
         .collect()
 }
 #[tauri::command]
+async fn archive_health(
+    state: tauri::State<'_, State>,
+    check: bool,
+) -> Result<serde_json::Value, String> {
+    let store = state.store.clone();
+    let root = state.data_path.clone();
+    let paused = state.paused.load(Ordering::SeqCst);
+    let clipboard = lock(&state.health)?.clone();
+    let error = lock(&state.error)?.clone();
+    let ocr_error = lock(&state.ocr_error)?.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let storage=lock(&store)?.storage_health(check)?;
+        let bytes=|suffix:&str|std::fs::metadata(root.join(format!("archive.sqlite3{suffix}"))).map(|m|m.len()).unwrap_or(0);
+        let spool=std::fs::read_dir(root.join("shell-spool")).ok().map(|r|r.flatten().filter(|e|e.path().extension().is_some_and(|x|x=="json")).count()).unwrap_or(0);
+        let sessions=archiver_core::shell::sessions(&root);
+        let reports=std::fs::read_dir(root.join("shell-sessions")).ok().map(|r|r.flatten().filter(|e|e.path().extension().is_some_and(|x|x=="json")).count()).unwrap_or(0);
+        Ok(serde_json::json!({"storage":storage,"databaseBytes":bytes(""),"walBytes":bytes("-wal"),"spoolPending":spool,"invalidReports":reports.saturating_sub(sessions.len()),"paused":paused,"clipboard":clipboard,"error":error,"ocrError":ocr_error,"platform":std::env::consts::OS,"dataPath":root.display().to_string()}))
+    }).await.map_err(|e|e.to_string())?
+}
+#[tauri::command]
+fn prepare_shell_repair(state: tauri::State<State>) -> Result<serde_json::Value, String> {
+    archiver_core::diagnostics::prepare_repair(&state.data_path)
+}
+#[tauri::command]
+async fn repair_shell_integration(
+    state: tauri::State<'_, State>,
+    approved: bool,
+) -> Result<String, String> {
+    let root = state.data_path.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        archiver_core::diagnostics::repair_powershell(&root, approved)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+#[tauri::command]
 fn integration_health(state: tauri::State<State>) -> Vec<serde_json::Value> {
     archiver_core::shell::sessions(&state.data_path)
         .into_iter()
@@ -857,7 +945,7 @@ fn integration_health(state: tauri::State<State>) -> Vec<serde_json::Value> {
             } else {
                 "Process unverified"
             };
-            serde_json::json!({"session":session,"connection":connection})
+            serde_json::json!({"readiness":archiver_core::shell::readiness(&session, now()),"session":session,"connection":connection})
         })
         .collect()
 }
@@ -878,6 +966,8 @@ async fn insert_command(
         let text = prepared.unwrap_or(original);
         let root = state.data_path.clone();
         let connection = shell::read_session(&root, &session)?;
+        let readiness=shell::readiness(&connection,now());
+        if !readiness.compatible || readiness.stale {return Err(readiness.advice.into());}
         if !connection.ready || !connection.insertion {
             return Err("This shell is busy or insertion is unavailable. Restart it after updating the integrations.".into());
         }
@@ -1433,6 +1523,8 @@ fn main() {
             recovery_items,
             undo_delete,
             export_archive,
+            preview_archive_import,
+            apply_archive_import,
             verify_backup,
             startup_status,
             launch_at_signin,
@@ -1446,6 +1538,9 @@ fn main() {
             paste_destination,
             shell_sessions,
             integration_health,
+            archive_health,
+            prepare_shell_repair,
+            repair_shell_integration,
             insert_command,
             save_snippet,
             import_history,
@@ -1542,6 +1637,7 @@ fn main() {
                 ocr_cancel: Arc::new(AtomicBool::new(false)),
                 ocr_error: Arc::new(Mutex::new(None)),
                 update: Mutex::new(None),
+                pending_import: Arc::new(Mutex::new(None)),
                 #[cfg(windows)]
                 destination,
             });

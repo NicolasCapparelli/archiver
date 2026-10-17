@@ -96,6 +96,7 @@ fn run() -> Result<(), String> {
                     ready: get(5)? == "true",
                     insertion: get(6)? == "true",
                     updated_at: now(),
+                    protocol_version: shell::PROTOCOL_VERSION,
                 };
                 atomic(
                     &shell::session_path(&root, session)?,

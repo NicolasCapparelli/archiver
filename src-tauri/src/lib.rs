@@ -1,4 +1,6 @@
 pub mod archive_io;
+pub mod archive_import;
+pub mod diagnostics;
 #[cfg(windows)]
 pub mod clipboard;
 #[cfg(windows)]

@@ -63,7 +63,9 @@ const groups = [
     "Recovery, portability, and agents",
     [
       "Undo deletion after explicitly configuring a recovery window; transactional restoration and expiry cleanup.",
-      "Portable JSONL exports and verified SQLite snapshot backups with SHA-256 manifests.",
+      "Portable JSONL exports and verified SQLite snapshot backups with SHA-256 manifests. Settings import validates schema, checksums, fingerprints and references, previews conflicts, then merges atomically and idempotently. Matching content keeps local annotations and library visibility. Limits: 256 MiB, 250,000 rows, 32 MiB per JSONL record.",
+      "Verified SQLite archive replacement with explicit preview/approval and a verified pre-restore backup; restores snippets, labels, OCR, saved groups/searches, recovery and revisions. Capture coordination and stale-preview rejection; preferences and shell profiles stay separate. Scheduled backups remain deferred.",
+      "Settings capture/storage diagnostics: clipboard/pause state, SQLite quick check, database/WAL/reusable page sizes, pending shell files, invalid reports and last errors; copy a summary excluding content, paths and error details. Shell readiness distinguishes old reports, platform limits and protocol mismatches. Explicitly approved Windows PowerShell repair uses the existing installer with profile backups; CMD/Clink setup remains manual, Unix/WSL experimental.",
       "Idempotent import of existing PowerShell/PSReadLine and Clink history.",
       "Local archiverctl CLI and persistent JSON Lines API for agent search, contribution, library management, and session transcripts.",
     ],

@@ -285,6 +285,7 @@ export async function deliverEmoji(text: string, paste = false) {
   else await navigator.clipboard.writeText(text);
 }
 export interface ShellSession {
+  protocolVersion?: number;
   session: string;
   source: string;
   pid: number;

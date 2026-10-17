@@ -1,3 +1,5 @@
+import { ArchiveImport } from "./archive-import";
+import { Diagnostics } from "./diagnostics";
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { native, type ShellSession } from "./api";
@@ -91,8 +93,8 @@ export function RecoveryAndBackup() {
         <h3>Portable exports & verified backups</h3>
         <p>
           JSONL exports include original representations as base64 and
-          occurrence metadata. SQLite backups also retain snippets, settings
-          stored in the archive, and any recovery records. Choose a new absolute
+          occurrence metadata. SQLite backups also retain snippets, saved searches,
+          groups, revisions and any recovery records. Choose a new absolute
           filename; existing files are preserved.
         </p>
         <label>
@@ -134,13 +136,14 @@ export function RecoveryAndBackup() {
           profiles are separate from the database.
         </p>
       </div>
+      <ArchiveImport />
       {message && <p role="status">{message}</p>}
     </>
   );
 }
 export function IntegrationHealth() {
   const [rows, setRows] = useState<
-      { session: ShellSession; connection: string }[]
+      { session: ShellSession; connection: string; readiness:{capture:string;insertion:string;advice:string;compatible:boolean;stale:boolean} }[]
     >([]),
     [error, setError] = useState("");
   useEffect(() => {
@@ -166,6 +169,8 @@ export function IntegrationHealth() {
     };
   }, []);
   return (
+    <>
+    <Diagnostics />
     <div className="setting-card">
       <h3>Shell connections</h3>
       <p>
@@ -178,16 +183,16 @@ export function IntegrationHealth() {
           shell.
         </p>
       )}
-      {rows.map(({ session: s, connection }) => (
+      {rows.map(({ session: s, connection,readiness }) => (
         <div className="shell-health" key={s.session}>
           <strong>
             {s.source} · {connection}
           </strong>
           <p>
-            {s.ready ? "At prompt" : "Busy"} ·{" "}
-            {s.insertion ? "Insertion enabled" : "Insertion unavailable"} · PID{" "}
+            {readiness.capture} · {readiness.insertion} · PID{" "}
             {s.pid}
           </p>
+          <p>{readiness.advice} Adapter protocol: {s.protocolVersion ?? 0} (expected 1).</p>
           <small>
             {s.directory}
             <br />
@@ -197,6 +202,7 @@ export function IntegrationHealth() {
       ))}
       {error && <p className="error">{error}</p>}
     </div>
+    </>
   );
 }
 type Occurrence = {
