@@ -1,5 +1,10 @@
 import type { Item } from "./api";
 
+// Null is the default, including groups created since the previous visit.
+export function groupCollapsed(name: string, collapsed: string[] | null) {
+  return collapsed === null || collapsed.includes(name);
+}
+
 export function snippetGroups(items: Item[], known: string[] = [], collection = "") {
   const groups = new Map<string, { name: string; items: Item[] }>();
   const add = (name: string) => {

@@ -25,6 +25,17 @@
   --danger-bg: #4b2a29;
   color-scheme: dark;
 }
+.tool-text { width: 100%; min-height: 180px; resize: vertical; padding: 10px; color: var(--ink); background: var(--panel); border: 1px solid var(--control-border); }
+.region-image { position: relative; width: 100%; touch-action: none; user-select: none; cursor: crosshair; overflow: hidden; }
+.region-image img { display: block; width: 100%; height: 100%; }
+.region-selection { position: absolute; border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent-bg) 30%, transparent); pointer-events: none; }
+.region-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-block: 12px; }
+.region-fields label { min-width: 0; color: var(--muted); }
+.region-fields input { width: 100%; }
+.json-rows { max-height: 50vh; overflow: auto; border: 1px solid var(--line); }
+.json-row { display: flex; align-items: center; gap: 6px; min-width: 0; padding-block: 4px; border-bottom: 1px solid var(--line); }
+.json-value { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.json-row > button { flex-shrink: 0; }
 
 * {
   scrollbar-width: thin;

@@ -50,6 +50,36 @@ fn image_ocr_text(
 ) -> Result<Option<archiver_core::ocr::OcrRecord>, String> {
     lock(&state.store)?.ocr_record(&id)
 }
+#[tauri::command]
+async fn recognize_image_region(
+    state: tauri::State<'_, State>, id: String, region: archiver_core::preview::Region,
+) -> Result<archiver_core::ocr::OcrRecord, String> {
+    if !cfg!(windows) { return Err("OCR recognition currently requires Windows".into()); }
+    state.ocr_running.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).map_err(|_| "An OCR scan is already running")?;
+    let job = OcrJob(state.ocr_running.clone());
+    let store = state.store.clone();
+    let path = state.data_path.join("ocr-tmp");
+    tauri::async_runtime::spawn_blocking(move || {
+        let _job = job;
+        let reps = {
+            let db = lock(&store)?;
+            if db.content(&id)?.0 != "image" { return Err("Choose an image item".into()); }
+            db.payload(&id)?
+        };
+        let data = archiver_core::preview::region_png(&reps, region)?;
+        // A region result is ephemeral; it never replaces full-image OCR or its index.
+        archiver_core::ocr::recognize(&[archiver_core::store::Representation { format: "PNG".into(), data }], &path)
+    }).await.map_err(|e| e.to_string())?
+}
+#[tauri::command]
+fn clip_note(state: tauri::State<State>, id: String) -> Result<String, String> {
+    lock(&state.store)?.clip_note(&id)
+}
+#[tauri::command]
+fn save_clip_note(app: tauri::AppHandle, state: tauri::State<State>, id: String, note: String) -> Result<(), String> {
+    lock(&state.store)?.save_clip_note(&id, &note)?;
+    app.emit("archive-changed", ()).map_err(|e| e.to_string())
+}
 struct OcrJob(Arc<AtomicBool>);
 impl Drop for OcrJob {
     fn drop(&mut self) {
@@ -624,6 +654,9 @@ fn save_settings(
         .parse()
         .map_err(|e| format!("Invalid stored shortcut: {e}"))?;
     let changed = shortcut != old;
+    if cfg!(windows) && changed && (1..=9).any(|count| recent_shortcut(count) == shortcut) {
+        return Err("Ctrl+Win+1–9 are reserved for pasting recent clips. Choose another Librarian shortcut.".into());
+    }
     // Reserve the new key first, so a conflict leaves the existing shortcut working.
     if changed {
         app.global_shortcut()
@@ -645,6 +678,12 @@ fn save_settings(
     }
     *current = settings;
     drop(current);
+    #[cfg(windows)]
+    if changed && (1..=9).any(|count| recent_shortcut(count) == old) {
+        if let Err(error) = app.global_shortcut().register(old) {
+            *lock(&state.error)? = Some(format!("Recent paste shortcut unavailable: {error}. Use the command palette."));
+        }
+    }
     app.emit("archive-changed", ()).map_err(|e| e.to_string())
 }
 #[tauri::command]
@@ -660,6 +699,7 @@ fn copy_item(
         None => vec![],
     };
     let plain = plain || reps.is_empty();
+    let reps = if plain { reps } else { archiver_core::replay::with_image_file(reps, &state.data_path.join("replay-images"))? };
     #[cfg(windows)]
     {
         archiver_core::clipboard::restore(
@@ -719,6 +759,7 @@ async fn paste_item(
         } else {
             lock(&state.store)?.payload(id.as_ref().ok_or("No clipboard item selected")?)?
         };
+        let replay_path = state.data_path.join("replay-images");
         let busy = state.inserting.clone();
         if busy.swap(true, Ordering::SeqCst) {
             return Err("Another delivery is in progress".into());
@@ -731,6 +772,7 @@ async fn paste_item(
                 }
             }
             let _busy = Busy(busy);
+            let reps = if plain { reps } else { archiver_core::replay::with_image_file(reps, &replay_path)? };
             delivery::wait_release()?;
             if delivery::Target::current().is_none_or(|current| {
                 current.pid
@@ -968,6 +1010,120 @@ fn overwrite_clip(
         .as_millis() as i64;
     lock(&state.store)?.replace_item_text(&id, &text, now)?;
     app.emit("archive-changed", ()).map_err(|e| e.to_string())
+}
+fn recent_shortcut(count: usize) -> tauri_plugin_global_shortcut::Shortcut {
+    use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
+    Shortcut::new(
+        Some(Modifiers::CONTROL | Modifiers::SUPER),
+        [
+            Code::Digit1,
+            Code::Digit2,
+            Code::Digit3,
+            Code::Digit4,
+            Code::Digit5,
+            Code::Digit6,
+            Code::Digit7,
+            Code::Digit8,
+            Code::Digit9,
+        ][count - 1],
+    )
+}
+#[tauri::command]
+async fn paste_recent(app: tauri::AppHandle, count: usize) -> Result<(), String> {
+    #[cfg(windows)]
+    {
+        paste_recent_to(app, count, archiver_core::delivery::Target::current()).await
+    }
+    #[cfg(not(windows))]
+    {
+        let _ = (app, count);
+        Err("Recent-clip paste is available on Windows only".into())
+    }
+}
+#[cfg(windows)]
+async fn paste_recent_to(
+    app: tauri::AppHandle,
+    count: usize,
+    origin: Option<archiver_core::delivery::Target>,
+) -> Result<(), String> {
+    #[cfg(windows)]
+    {
+        use archiver_core::{clipboard, delivery, recent};
+        let state = app.state::<State>();
+        let origin = origin.ok_or("No focused destination control")?;
+        let own_pid = unsafe { windows_sys::Win32::System::Threading::GetCurrentProcessId() };
+        let from_app = origin.pid == own_pid;
+        let target = if from_app {
+            lock(&state.destination)?.ok_or("Open Librarian from the destination app first")?
+        } else {
+            origin
+        };
+        let source = unsafe { clipboard::process_name(target.pid) }.to_lowercase();
+        if [
+            "windowsterminal.exe",
+            "cmd.exe",
+            "powershell.exe",
+            "pwsh.exe",
+            "conhost.exe",
+            "mintty.exe",
+            "wezterm-gui.exe",
+            "alacritty.exe",
+        ]
+        .contains(&source.as_str())
+        {
+            return Err("Use shell insertion for terminal destinations; batch multiline paste can execute commands.".into());
+        }
+        let busy = state.inserting.clone();
+        if busy.swap(true, Ordering::SeqCst) {
+            return Err("Another delivery is in progress".into());
+        }
+        let store = state.store.clone();
+        let cache = state.data_path.join("replay-images");
+        tauri::async_runtime::spawn_blocking(move || {
+            struct Busy(Arc<AtomicBool>);
+            impl Drop for Busy {
+                fn drop(&mut self) {
+                    self.0.store(false, Ordering::SeqCst);
+                }
+            }
+            let _busy = Busy(busy);
+            // Snapshot and validate everything before changing clipboard or foreground app.
+            let snapshot = {
+                let db = lock(&store)?;
+                recent::snapshot(&db, count)?
+            };
+            // Image decoding and cache writes must not hold up the capture writer.
+            let (reps, text) = recent::prepare_snapshot(snapshot, &cache)?;
+            delivery::wait_release()?;
+            if !origin.focused() {
+                return Err("Focus changed before recent-clip delivery. Nothing was sent.".into());
+            }
+            let window = app
+                .get_webview_window("main")
+                .ok_or("Archivist window unavailable")?;
+            let hwnd = window.hwnd().map_err(|e| e.to_string())?.0 as _;
+            if from_app {
+                if let Some(quick) = app.get_webview_window("quick") {
+                    quick.hide().map_err(|e| e.to_string())?;
+                }
+                window.hide().map_err(|e| e.to_string())?;
+                target.restore_focus()?;
+            }
+            if !target.focused() {
+                return Err("Destination changed before recent-clip delivery".into());
+            }
+            clipboard::restore(hwnd, &reps, &text, reps.is_empty())?;
+            delivery::send_chord(
+                target,
+                &[
+                    windows_sys::Win32::UI::Input::KeyboardAndMouse::VK_CONTROL,
+                    0x56,
+                ],
+            )
+        })
+        .await
+        .map_err(|e| e.to_string())?
+    }
 }
 fn archivist_shortcut() -> tauri_plugin_global_shortcut::Shortcut {
     use tauri_plugin_global_shortcut::{Code, Modifiers};
@@ -1207,6 +1363,28 @@ fn main() {
                             let _ = show_archive(app.clone());
                             return;
                         }
+                        let is_quick = app.try_state::<State>().and_then(|state| state.settings.lock().ok().map(|s| s.shortcut.parse::<tauri_plugin_global_shortcut::Shortcut>().ok() == Some(*shortcut))).unwrap_or(false);
+                        if !is_quick {
+                            if let Some(count) = (1..=9).find(|count| recent_shortcut(*count) == *shortcut) {
+                                let app = app.clone();
+                                #[cfg(windows)]
+                                let origin = archiver_core::delivery::Target::current();
+                                tauri::async_runtime::spawn(async move {
+                                    #[cfg(windows)]
+                                    let result = paste_recent_to(app.clone(), count, origin).await;
+                                    #[cfg(not(windows))]
+                                    let result = paste_recent(app.clone(), count).await;
+                                    if let Err(error) = result {
+                                        if error != "Another delivery is in progress" {
+                                            if let Some(state) = app.try_state::<State>() { if let Ok(mut saved) = state.error.lock() { *saved = Some(error.clone()); } }
+                                            let _ = show_quick(app.clone());
+                                            let _ = app.emit("recent-paste-error", error);
+                                        }
+                                    }
+                                });
+                                return;
+                            }
+                        }
                         if let Err(e) = show_quick(app.clone()) {
                             if let Some(state) = app.try_state::<State>() {
                                 if let Ok(mut error) = state.error.lock() {
@@ -1245,6 +1423,9 @@ fn main() {
             ocr_status,
             cancel_ocr,
             image_ocr_text,
+            recognize_image_region,
+            clip_note,
+            save_clip_note,
             scan_image_text,
             pin_item,
             rename_item,
@@ -1261,6 +1442,7 @@ fn main() {
             capture_status,
             copy_item,
             paste_item,
+            paste_recent,
             paste_destination,
             shell_sessions,
             integration_health,
@@ -1458,6 +1640,15 @@ fn main() {
             ) {
                 if let Ok(mut error) = app.state::<State>().error.lock() {
                     *error = Some(format!("Quick-access shortcut unavailable: {e}"));
+                }
+            }
+            #[cfg(windows)]
+            for count in 1..=9 {
+                if let Err(e) = app.global_shortcut().register(recent_shortcut(count)) {
+                    if let Ok(mut error) = app.state::<State>().error.lock() {
+                        let previous = error.take().unwrap_or_default();
+                        *error = Some(format!("{previous} Recent paste Ctrl+Win+{count} unavailable: {e}. Use the command palette."));
+                    }
                 }
             }
             let show = tauri::menu::MenuItem::with_id(

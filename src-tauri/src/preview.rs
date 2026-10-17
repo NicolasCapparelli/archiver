@@ -110,13 +110,51 @@ pub fn generate(reps: &[Representation], thumbnail: bool) -> Result<Preview> {
     }
     Err(failure)
 }
-pub fn ocr_png(reps: &[Representation]) -> Result<Vec<u8>> {
+pub fn replay_png(reps: &[Representation]) -> Result<Vec<u8>> {
+    png_bytes(reps, false)
+}
+#[derive(Clone, Copy, Deserialize)]
+pub struct Region {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+pub fn region_png(reps: &[Representation], region: Region) -> Result<Vec<u8>> {
+    if ![region.x, region.y, region.width, region.height].iter().all(|v| v.is_finite())
+        || region.x < 0.0 || region.y < 0.0 || region.width <= 0.0 || region.height <= 0.0
+        || region.x + region.width > 1.0 + 1e-9 || region.y + region.height > 1.0 + 1e-9
+    { return Err("Choose a nonempty region inside the image".into()); }
     let mut failure = "No supported image representation".to_string();
     for format in ["PNG", "image/png", "JFIF", "CF_DIBV5", "CF_DIB"] {
         if let Some(rep) = reps.iter().find(|rep| rep.format == format) {
             match decode(rep) {
                 Ok(image) => {
-                    let image = image.thumbnail(2048, 2048);
+                    let x = (region.x * image.width() as f64).round() as u32;
+                    let y = (region.y * image.height() as f64).round() as u32;
+                    let right = ((region.x + region.width) * image.width() as f64).round().min(image.width() as f64) as u32;
+                    let bottom = ((region.y + region.height) * image.height() as f64).round().min(image.height() as f64) as u32;
+                    if right <= x || bottom <= y { return Err("Select at least one image pixel".into()); }
+                    let mut bytes = Cursor::new(Vec::new());
+                    image.crop_imm(x, y, right - x, bottom - y).write_to(&mut bytes, ImageFormat::Png).map_err(|e| e.to_string())?;
+                    return Ok(bytes.into_inner());
+                }
+                Err(error) => failure = error,
+            }
+        }
+    }
+    Err(failure)
+}
+pub fn ocr_png(reps: &[Representation]) -> Result<Vec<u8>> {
+    png_bytes(reps, true)
+}
+fn png_bytes(reps: &[Representation], thumbnail: bool) -> Result<Vec<u8>> {
+    let mut failure = "No supported image representation".to_string();
+    for format in ["PNG", "image/png", "JFIF", "CF_DIBV5", "CF_DIB"] {
+        if let Some(rep) = reps.iter().find(|rep| rep.format == format) {
+            match decode(rep) {
+                Ok(image) => {
+                    let image = if thumbnail { image.thumbnail(2048, 2048) } else { image };
                     let mut bytes = Cursor::new(Vec::new());
                     image
                         .write_to(&mut bytes, ImageFormat::Png)
@@ -132,6 +170,21 @@ pub fn ocr_png(reps: &[Representation]) -> Result<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn region_crops_original_pixels_and_rejects_invalid_bounds() {
+        let image = image::RgbImage::from_fn(10, 8, |x, y| image::Rgb([x as u8, y as u8, 42]));
+        let mut data = Cursor::new(Vec::new());
+        image.write_to(&mut data, ImageFormat::Png).unwrap();
+        let reps = vec![Representation { format: "PNG".into(), data: data.into_inner() }];
+        let region = Region { x: 0.2, y: 0.25, width: 0.4, height: 0.5 };
+        let crop = image::load_from_memory(&region_png(&reps, region).unwrap()).unwrap().to_rgb8();
+        assert_eq!(crop.dimensions(), (4, 4));
+        assert_eq!(crop.get_pixel(0, 0).0, [2, 2, 42]);
+        assert_eq!(crop.get_pixel(3, 3).0, [5, 5, 42]);
+        for bad in [Region { x: -0.1, ..region }, Region { width: 0.0, ..region }, Region { x: 0.9, ..region }, Region { y: f64::NAN, ..region }] {
+            assert!(region_png(&reps, bad).is_err());
+        }
+    }
     #[test]
     fn bottom_up_and_top_down_dib_preserve_pixels() {
         for height in [2i32, -2] {

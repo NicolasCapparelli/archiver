@@ -23,7 +23,7 @@ struct Table {
 }
 // library_clear_snapshot is local visibility-undo state: full SQLite backups include it,
 // portable exports and per-item deletion recovery intentionally do not.
-const TABLES: [&str; 9] = [
+const TABLES: [&str; 10] = [
     "items",
     "events",
     "representations",
@@ -32,6 +32,7 @@ const TABLES: [&str; 9] = [
     "links",
     "labels",
     "image_text",
+    "item_notes",
     "library",
 ];
 fn err(e: impl std::fmt::Display) -> String {
@@ -149,7 +150,7 @@ impl Store {
             .map(str::to_string);
         for name in TABLES {
             let Some(table) = snapshot.tables.get_mut(name) else {
-                if name == "labels" || name == "image_text" || name == "library" {
+                if name == "labels" || name == "image_text" || name == "library" || name == "item_notes" {
                     continue;
                 } // Recovery records created before labels remain usable.
                 return Err("Incomplete recovery record".into());
@@ -316,7 +317,7 @@ pub fn verify_sqlite(path: &Path) -> Result<()> {
         rusqlite::Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
             .map_err(err)?;
     for table in TABLES {
-        if table == "labels" || table == "image_text" || table == "library" {
+        if table == "labels" || table == "image_text" || table == "library" || table == "item_notes" {
             continue;
         }
         let exists: bool = conn

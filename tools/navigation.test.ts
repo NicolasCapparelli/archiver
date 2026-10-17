@@ -1,8 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { nextIndex, navigationKey, shortcutFromKey, isArchivistShortcut } from "../src/navigation.ts";
-import { snippetGroups } from "../src/snippet-groups.ts";
+import { snippetGroups, groupCollapsed } from "../src/snippet-groups.ts";
 import type { Item } from "../src/api.ts";
+
+test("new and ungrouped sections default closed while explicit search/memory state is respected", () => {
+  for (const name of ["Work", "", "New group"]) assert.equal(groupCollapsed(name, null), true);
+  assert.equal(groupCollapsed("Work", []), false);
+  assert.equal(groupCollapsed("Work", ["Work"]), true);
+  assert.equal(groupCollapsed("Personal", ["Work"]), false);
+});
 
 test("snippet groups follow user collections across types, preserve empty groups and put ungrouped last", () => {
   const rows = [

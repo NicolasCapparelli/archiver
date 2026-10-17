@@ -96,6 +96,12 @@ Ctrl+Shift+G (also F1/palette) opens **Tags & collections**. Select up to 500 lo
 
 ## Snippets, groups and appearance follow-up
 
+R14: entering Snippets starts all sections collapsed, including Ungrouped and newly created groups. A nonempty search reveals matches; clearing search collapses them. Optional Librarian state memory still restores saved group state on reopen. While category tabs have focus, Left/Right keeps switching tabs; Down enters the group headings. Within groups Left/Right collapses/expands, Enter toggles the heading, and Up/Down traverses headings and open rows. Ctrl+Tab / Ctrl+Shift+Tab switches Librarian categories from results/search.
+
+On Windows, **Ctrl+Win+1–9** pastes up to that many distinct recent clipboard records in a single operation, from oldest to newest. Text clips join with line breaks; an all-image/file selection becomes one file drop. Mixed text and image/file batches show an error without sending a partial paste. Uses permanent clipboard history independently of library filters, excludes shell command records and snippets, and leaves the paste queue alone. Palette actions **Paste last N clips** provide the same operation if a global chord is unavailable. Existing terminal/focus checks apply. Repeated copies of the same stored item count as one recent clip.
+
+Ordinary image copying/pasting now includes both original image formats and a full-resolution PNG file reference for Explorer folders. PNGs are generated in the app-data `replay-images` cache and reused; deleting a cached file invalidates its current clipboard reference until the image is copied again. Exotic native formats still need adapters. Plain-text copy remains unchanged. Native Explorer and app compatibility check is pending H20.
+
 Librarian opens on All with the first result focused by default (state memory can restore its prior browsing state); W/S move results and A/D switch tabs immediately. Press Ctrl+K to type a search. Ctrl+Alt+O opens/focuses Archivist (the old Ctrl+Shift+O failed in user testing and is retired); the Archivist button remains available.
 
 Select a snippet and press **Ctrl+T** in either window to edit its name, note and content. Notes stay separate from copied/pasted text. Within the editor **Ctrl+T** opens the transform list (arrows/Enter); **Ctrl+S** saves and **Esc** cancels. Playground and Full Clip use **Ctrl+Alt+S** to open a new snippet form with the current editor text. Their existing Ctrl+S/Ctrl+Shift+S clip saving commands remain available.
@@ -121,3 +127,7 @@ Use the sidebar for history categories; the main page has no duplicate category 
 Librarian state memory remembers browsing only, not open editing dialogs or an expanded workbench. The preference is saved in native Settings; its browsing snapshot is local to the quick webview and survives restart. With memory off, reopening always uses the default library view.
 
 Text tools: **Ctrl+F** searches within Full clip, Paste Playground and Expanded Librarian. Matches are literal and case-insensitive, highlighted with a count. **Enter/F3** advances; **Shift+Enter/Shift+F3** goes back, wrapping at either end. **Escape** closes find and returns focus to the text; another Escape exits the viewer. Find does not change the text. Syntax colors resume when find closes. Archivist also provides a **Find** button.
+
+## Region OCR, JSON and clip notes (R15)
+
+Select an image and use Region OCR in details or the command palette. Drag a rectangle or enter pixel bounds, then Recognize and Copy result. This Windows-only operation keeps the original image and full-image OCR intact. Select text for JSON explorer, or press Ctrl+Alt+J in Full clip/Paste Playground; expand containers and copy exact values or JSON Pointer paths. Invalid JSON reports a location. Edit clip notes from details or the palette; Save (Ctrl+S) stores separate searchable annotations, and saving an empty note removes it. Notes are not pasted with the clip.

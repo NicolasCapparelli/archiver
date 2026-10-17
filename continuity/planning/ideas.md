@@ -1,6 +1,13 @@
 # Ideas and possibilities
 
+**Later user selection (2026-10-17):** Region OCR (N16), JSON explorer including Paste Playground (N14), archive notes (N20), editable left/right text diff and extractors (N18) are now the first five implementation priorities, with commits every two or three implementations. The roadmap owns current state. Other suggestions remain unselected; earlier proposal statements below are historical.
+
+
+**2026-10-17 user revision:** the [roadmap](roadmap.md#current-user-selected-priorities-2026-10-17-revision) now owns the 15 surviving priorities. The [revision study](studies/feature-priorities-2026-10-17.md) adds eight unselected proposals N13–N20. Omitted rows, including Q4 scheduled backups, leave the active selection; the earlier review below retains provenance and historical dispositions.
+
 Selective reading, not startup. Selected work lives in the [roadmap](roadmap.md). Items marked "design draft 0.2" come from the [historical product design draft](../history/product-design-draft-0.2.md); they are proposals, not commitments. Migrated and extended 2026-10-13 so no future/open item of the old root documents is lost.
+
+**2026-10-17 review supersedes the old open states below:** [feature review](studies/feature-review-2026-10-17.md) contains the disposition of every I1–I30 idea and the ranked surviving set. Keep the rows as provenance. Drop active automatic pruning (I7), execution/workflow automation (I13), speculative font refinement (I21) and tooling/artwork/historical notes as product features (I3/I23/I25). Sync, AI, remote support and extra destination tracking remain deferred; Ctrl+R still requires a new request. Twelve newly proposed extensions N1–N12 are defined and ranked in that study; none is implemented by this review.
 
 | ID | Idea | Origin / date | State | Open question |
 | --- | --- | --- | --- | --- |

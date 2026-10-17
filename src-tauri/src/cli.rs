@@ -219,7 +219,7 @@ fn run() -> Result<(), String> {
                     "read" => {
                         let id = field("id")?;
                         let (kind, text) = store.content(id)?;
-                        json!({"kind":kind,"text":text,"representations":store.payload(id)?,"ocr":store.ocr_record(id)?})
+                        json!({"kind":kind,"text":text,"representations":store.payload(id)?,"ocr":store.ocr_record(id)?,"note":if id.starts_with("snippet:"){String::new()}else{store.clip_note(id)?}})
                     }
                     "contribute" => {
                         let capture: Capture =
@@ -283,7 +283,7 @@ fn run() -> Result<(), String> {
         .map_err(|e| e.to_string())?,
         "read" => {
             let (kind, text) = store.content(get(1)?)?;
-            json!({"kind":kind,"text":text,"representations":store.payload(get(1)?)?,"ocr":store.ocr_record(get(1)?)?})
+            json!({"kind":kind,"text":text,"representations":store.payload(get(1)?)?,"ocr":store.ocr_record(get(1)?)?,"note":if get(1)?.starts_with("snippet:"){String::new()}else{store.clip_note(get(1)?)?}})
         }
         "contribute" => {
             let capture: Capture = serde_json::from_str(&stdin()?).map_err(|e| e.to_string())?;

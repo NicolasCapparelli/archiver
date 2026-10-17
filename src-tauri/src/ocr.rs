@@ -206,6 +206,20 @@ mod tests {
         assert_eq!(std::fs::read_dir(&path).unwrap().count(), 0);
         std::fs::remove_dir(path).unwrap();
     }
+    #[cfg(windows)]
+    #[test]
+    #[ignore = "requires installed Windows OCR language and tools/test-ocr.ps1 -KeepFixture"]
+    fn actual_windows_region_worker_recognizes_crop() {
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().join("target");
+        let data = std::fs::read(root.join("ocr-fixture.png")).unwrap();
+        let reps = vec![crate::store::Representation { format: "PNG".into(), data }];
+        let data = crate::preview::region_png(&reps, crate::preview::Region { x: 0.0, y: 0.2, width: 1.0, height: 0.6 }).unwrap();
+        let path = root.join(format!("region-worker-{}", uuid::Uuid::new_v4()));
+        let result = recognize(&[crate::store::Representation { format: "PNG".into(), data }], &path).unwrap();
+        assert!(result.text.contains("ORBITAL ARCHIVE 42"), "{}", result.text);
+        assert_eq!(std::fs::read_dir(&path).unwrap().count(), 0);
+        std::fs::remove_dir(path).unwrap();
+    }
     use crate::store::Capture;
     #[test]
     fn clipboard_events_target_only_the_copied_unscanned_image() {

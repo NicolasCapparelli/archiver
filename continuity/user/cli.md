@@ -55,3 +55,5 @@ Keep a subprocess alive, write UTF-8 requests, and read corresponding response l
 
 
 Snippet save JSON accepts an optional `note` string (up to 10,000 characters); omitting it on edits preserves the existing note, and an empty string clears it. Search/list snippet rows expose `note`; copied content remains the text alone. Search image rows expose optional `ocrMatch` excerpt/highlight offsets (UTF-16)/fuzzy flag.
+
+R15: `read` (CLI and stdio) returns the separate archived clip `note` alongside text, representations and OCR; notes are not part of payload text. Snippet notes retain their existing search metadata representation.

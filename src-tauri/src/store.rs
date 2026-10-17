@@ -158,6 +158,7 @@ impl Store {
                 .map_err(err)?;
         }
         crate::ocr::initialize(&conn)?;
+        crate::notes::initialize(&conn)?;
         crate::library::initialize(&conn)?;
         crate::search::initialize(&conn)?;
         Ok(Self { conn })
@@ -405,14 +406,14 @@ impl Store {
             (SELECT COUNT(*) FROM events WHERE item_id=i.id),
             COALESCE((SELECT SUM(length(data)) FROM representations WHERE item_id=i.id),0),
             result.exit_code,result.successful,result.duration_ms,
-            (SELECT COUNT(*) FROM events failures JOIN command_results failed ON failed.session=failures.session AND failed.sequence=failures.sequence WHERE failures.item_id=i.id AND failed.successful=0), CASE WHEN :preview='' THEN '' ELSE COALESCE((SELECT text FROM image_text WHERE item_id=i.id),'') END,i.title
+            (SELECT COUNT(*) FROM events failures JOIN command_results failed ON failed.session=failures.session AND failed.sequence=failures.sequence WHERE failures.item_id=i.id AND failed.successful=0), CASE WHEN :preview='' THEN '' ELSE COALESCE((SELECT text FROM image_text WHERE item_id=i.id),'') END,i.title,COALESCE((SELECT note FROM item_notes WHERE item_id=i.id),'')
             FROM items i JOIN events e ON e.rowid=(SELECT rowid FROM events WHERE item_id=i.id
               AND (:source='' OR source LIKE :source ESCAPE '\\') AND (:path='' OR directory LIKE :path ESCAPE '\\')
               AND (:from IS NULL OR last_seen>=:from) AND (:until IS NULL OR first_seen<:until) AND (:session='' OR session=:session)
               ORDER BY last_seen DESC,rowid DESC LIMIT 1)
             LEFT JOIN command_results result ON result.session=e.session AND result.sequence=e.sequence
             LEFT JOIN fuzzy ranked ON ranked.id=i.id
-            WHERE (:query='' OR i.title LIKE :pattern ESCAPE '\\' OR i.text LIKE :pattern ESCAPE '\\' OR e.directory LIKE :pattern ESCAPE '\\' OR e.source LIKE :pattern ESCAPE '\\' OR EXISTS(SELECT 1 FROM links WHERE item_id=i.id AND title LIKE :pattern ESCAPE '\\') OR EXISTS(SELECT 1 FROM image_text WHERE item_id=i.id AND text LIKE :pattern ESCAPE '\\'))
+            WHERE (:query='' OR i.title LIKE :pattern ESCAPE '\\' OR EXISTS(SELECT 1 FROM item_notes WHERE item_id=i.id AND note LIKE :pattern ESCAPE '\\') OR i.text LIKE :pattern ESCAPE '\\' OR e.directory LIKE :pattern ESCAPE '\\' OR e.source LIKE :pattern ESCAPE '\\' OR EXISTS(SELECT 1 FROM links WHERE item_id=i.id AND title LIKE :pattern ESCAPE '\\') OR EXISTS(SELECT 1 FROM image_text WHERE item_id=i.id AND text LIKE :pattern ESCAPE '\\'))
             AND (:view='all' OR (:view='pinned' AND i.pinned=1) OR (:view='clips' AND i.kind!='command') OR i.kind=:view OR (:view='links' AND EXISTS(SELECT 1 FROM links WHERE item_id=i.id)) OR (:view='failed' AND EXISTS(SELECT 1 FROM events failures JOIN command_results failed ON failed.session=failures.session AND failed.sequence=failures.sequence WHERE failures.item_id=i.id AND failed.successful=0)))
             AND (:kind='' OR i.kind=:kind) AND (:pinned IS NULL OR i.pinned=:pinned)
             AND (:library=0 OR EXISTS(SELECT 1 FROM library WHERE item_id=i.id))
@@ -469,7 +470,7 @@ impl Store {
                         bytes: r.get(9)?,
                         name: String::new(),
                         title: r.get(15)?,
-                        note: String::new(),
+                        note: r.get(16)?,
                         ocr_match: crate::search::ocr_match(&r.get::<_,String>(14)?, query, fuzzy),
                         exit_code: r.get(10)?,
                         successful: r.get(11)?,

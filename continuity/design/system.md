@@ -26,6 +26,8 @@ The Reading Room migration record states that all 76 production semantic contras
 
 ## Components and interaction
 
+R14 keeps the existing Reading Room shell and snippet headings. New section visits default closed; focus on category tabs persists until the user enters groups, and Ctrl+Tab provides a category escape from results. Recent-paste actions use the existing F1/palette and toast/error primitives without adding toolbar controls or new visual tokens. Native interaction and appearance remain H20; no computer/browser automation was authorized.
+
 Primitives live in `src/style.css` and the React components: `button` (reset style, focus-visible inset outline 2px `--accent`), `.primary` / `.secondary` buttons, `.chip` (`.chosen` state), `kbd` keycaps (bordered), `.entry` / `.entry.selected` result rows, `.tool-dialog` (shared dialog frame, width up to 600px, serif `h2`; frame in `src/tool-dialog.tsx`), `.dialog-actions`, `.palette-action`, `.setting-card`, `.item-labels`. Interaction: Archivist uses visible buttons/menus for management; Librarian uses shortcuts for tools (Up/Down/Home/End, Left/Right tabs, F1 dialog, Ctrl+K search); focus must stay visible; dialogs hold keyboard focus and return it on close.
 
 ## References and exceptions
@@ -47,3 +49,7 @@ Primitives live in `src/style.css` and the React components: `button` (reset sty
 - R12 (2026-10-13) supersedes R10 list composition with a responsive emoji grid: 44px cells, quiet border/background selection, named tooltips/accessible buttons and selected-name caption. Arrows/WASD follow actual columns; no new tokens or shadows. Archivist groups appear only in Snippets. Main heading removes the eyebrow and uses 28px serif/11px subtitle with 10px vertical padding. Details have a bounded grid row and image preview and reset their scroll per selection. Source-reviewed and build/helper-tested; both-theme/narrow-width visual and native H18 pending.
 
 - R13 text find (2026-10-14): compact inline search uses existing inputs/secondary buttons, muted count, brass meaning-match background and spruce active-match background/outline. No new tokens or shadows. Shared workbench preserves copy/edit/save surface; Escape first dismisses find and restores text focus. Source reviewed against Reading Room tokens; both-theme/native visual checks pending H19.
+
+## R15 tool extensions
+
+Region OCR uses an accent rectangle over a proportional image with equivalent labeled pixel-coordinate controls. JSON uses bounded, wrapping indented rows and explicit expand/copy controls. Notes use the shared text field and ToolDialog. Nested dialogs restore the previous focus. Existing semantic colors, flat surfaces and keyboard focus remain authoritative. Frontend compilation passes; native layout, pointer selection and focus checks remain pending H21.

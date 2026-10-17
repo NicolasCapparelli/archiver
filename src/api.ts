@@ -165,6 +165,10 @@ export async function restoreLibrary(id: string) {
   if (native) await invoke("restore_library_item", { id });
   else previewLibrary.add(id);
 }
+export async function pasteRecent(count: number) {
+  if (!native) throw new Error("Recent-clip paste is available in the Windows app");
+  await invoke("paste_recent", { count });
+}
 export async function list(
   query: string,
   filter: string,

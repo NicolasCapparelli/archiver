@@ -55,8 +55,12 @@ Verification defaults: Rust `npm run check:rust` and `npm test`; frontend `npm r
 
 ## Investigation notes
 
+R14 delivery extension: `src-tauri/src/replay.rs` builds image-derived PNG/CF_HDROP replay data; `recent.rs` selects/combines permanent recent clipboard clips, tests both modules via `npm test`. `main.rs` registers Ctrl+Win+1–9 and `paste_recent`, `api.ts`/`main.tsx` expose palette fallback. Existing `delivery.rs` remains the focus/key authority. `snippet-groups.ts` owns default collapsed semantics; `main.tsx` preserves category focus and handles Ctrl+Tab. Cache/snapshot model: [R14](../data/model.md#image-replay-cache-and-recent-snapshots-r14). Native check H20.
+
 - Cross-feature bug example: a wrong result after clearing the library involves [library scope](#library-scope), [search](#search), and [storage](#foundation-storage).
 - Ownership uncertainty: `main.rs` and `main.tsx` (each well over 1,000 lines) hold many routes; locate by command name or handler.
 - Design/behavior history of the product draft: [product design draft 0.2](../history/product-design-draft-0.2.md); plans: [roadmap](../planning/roadmap.md) (Q1/Q2/Q5/Q6 implemented; Q3/Q4/Q7 remain planned); capability baseline: [implemented features](../developer/implemented-features.md).
 - Dev loop: `npm run launch` = `tools/launch.mjs` (kill running `archiver.exe`, `tools/desktop.mjs build` = tauri build --no-bundle, start `target/release/archiver.exe` detached).
 - Route count derived from the tables above: 28 route rows (including the full-clip row and the setup/recent/planning/UI navigation rows) and 7 foundations.
+
+R15 tools: `src/region-ocr.tsx` → `recognize_image_region` in `main.rs` → `preview.rs::region_png` → `ocr.rs`; `src/json-explorer.tsx` + `json-tree.ts` own strict source-preserving JSON inspection, embedded in `clip-workbench.tsx`; `src/clip-notes.tsx` → `notes.rs` → central `search.rs` indexing and `archive_io.rs` snapshots. Tests: `tools/json-tree.test.ts`, notes lifecycle/crop tests in Rust. Shared nested modal focus: `tool-dialog.tsx`. Native check H21.

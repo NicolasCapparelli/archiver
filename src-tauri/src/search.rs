@@ -218,6 +218,8 @@ fn score(query: &str, word: &str) -> Option<usize> {
     Some(2)
 }
 pub(crate) fn index(conn: &Connection, id: &str, text: &str) -> Result<()> {
+    let note: String = conn.query_row("SELECT COALESCE((SELECT note FROM item_notes WHERE item_id=?),'')", [id], |r| r.get(0)).map_err(|e| e.to_string())?;
+    let text = format!("{note} {text}");
     let old: Vec<String> = {
         let mut stmt = conn
             .prepare("SELECT term FROM item_terms WHERE item_id=?")
@@ -231,7 +233,7 @@ pub(crate) fn index(conn: &Connection, id: &str, text: &str) -> Result<()> {
     };
     conn.execute("DELETE FROM item_terms WHERE item_id=?", [id])
         .map_err(|e| e.to_string())?;
-    for word in words(text) {
+    for word in words(&text) {
         let added = conn
             .execute("INSERT OR IGNORE INTO terms VALUES(?)", [&word])
             .map_err(|e| e.to_string())?;

@@ -75,3 +75,17 @@ Search/list Item rows now include `collections`, derived from collection labels 
 `settings.json` adds camelCase `librarianStateMemory`, default false via serde defaults. Quick-webview localStorage key `archiver-librarian-state` stores tab/query/options/scope, selection, collapsed groups, scroll, loaded count and shell session. This is a browsing cache, excluded from archive exports/backups. With memory disabled it is ignored/removed on opening; editing tools are not restored.
 
 `archive_statistics` derives counts from permanent items/events/snippets/labels/saved searches and current library membership, with no writes. Total captures sums event repeats; source breakdown counts event rows (latest eight sources), type breakdown counts distinct items. First/latest dates come from events; snippets do not create capture events.
+
+### Image replay cache and recent snapshots (R14)
+
+`replay.rs` supplements replay payloads only: SHA-256 of length-delimited original format names/data names a full-resolution `replay-images/archiver-image-<hash>.png` under app data. A unique pending write and rename publishes it; subsequent replay regenerates missing files. CF_HDROP uses absolute UTF-16 DROPFILES paths and a copy Preferred DropEffect. Original representations/identity/occurrences remain unchanged. This derived cache is outside SQLite snapshots; it is rebuildable, not a second archive or full file archival. It persists so copied file references outlive UI dismissal; no automatic deletion/retention is added.
+
+`recent.rs` reads the latest up to nine distinct noncommand items through the existing clips query (permanent scope), reverses to oldest-first, and prepares one newline-joined plain text or one image/file drop. It reads no snippets, modifies no queue/library membership and rejects mixed types before input. Fewer than N records use all available. Combined file drops validate referenced files. Capture already ignores clipboard ownership by this process, so replay does not automatically create a new history record.
+
+Browsing collapse cache now uses `null` for default-all-collapsed (including future groups); an array lists explicitly collapsed names, with `[]` meaning all expanded for search. Old array caches still restore when memory is enabled. New Snippets tab visits reset to collapsed unless a nonempty query reveals matches; reopen restoration honors the opted-in saved state.
+
+## Clip annotations and region OCR (R15)
+
+`notes.rs` owns optional `item_notes(item_id PRIMARY KEY REFERENCES items ON DELETE CASCADE, note TEXT NOT NULL)`, initialized before search. Notes are capped at 10,000 Unicode characters, separate from representation identity, and prepended to the bounded fuzzy search input. Literal search includes notes. Central indexing preserves notes through rename, recapture, overwrite and recovery. Archive table snapshots/export include notes; older recovery records may omit the table. CLI/stdio read exposes a separate `note` field.
+
+`recognize_image_region` validates finite normalized coordinates, decodes a supported original representation and crops before the existing OCR worker resizing. Shared OCR busy guard, temporary-file cleanup and Windows language limitations apply; results are ephemeral and never replace stored whole-image text. JSON explorer slices source ranges instead of serializing JavaScript numbers, preserving exact numeric values.

@@ -11,7 +11,7 @@
     "launch": "node tools/launch.mjs",
     "check:rust": "node tools/desktop.mjs check",
     "test": "node tools/desktop.mjs test",
-    "test:ui": "node --test tools/navigation.test.ts tools/clink.test.mjs tools/text-tools.test.ts tools/highlight.test.ts tools/diff.test.ts tools/emoji.test.ts tools/text-find.test.ts",
+    "test:ui": "node --test tools/navigation.test.ts tools/clink.test.mjs tools/text-tools.test.ts tools/highlight.test.ts tools/diff.test.ts tools/emoji.test.ts tools/text-find.test.ts tools/json-tree.test.ts",
     "test:shell": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test-shell.ps1",
     "test:setup": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/test-install.ps1",
     "test:cli": "node tools/test-cli.mjs",

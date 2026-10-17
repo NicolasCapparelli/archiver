@@ -6,10 +6,16 @@ This is the index for future work. [Roadmap](roadmap.md) owns selected work, seq
 
 The root ROADMAP.md and HANDOFF.md were migrated here on 2026-10-13 and removed. Implemented-pending-verification work (R1-R4), the queued tasks with full acceptance (Q1-Q7) and the platform/validation/release backlog (L1-L10) are in the [roadmap](roadmap.md); possibilities from the old design draft and design study are in [ideas](ideas.md). The historical product design draft is [history/product-design-draft-0.2.md](../history/product-design-draft-0.2.md); the Reading Room visual study is [design/reading-room](../design/reading-room/README.md). AGENTS.md remains the agent rule source.
 
-Q1/Q2/Q5/Q6 are implemented in source; Q3 portable import/verified restore is the next remaining item in the [Q1-Q7 queue](roadmap.md#next-agent-queue-q1q7), followed by Q4 and Q7. R6/R7 user follow-ups are implemented; native checks remain pending. I20 Follow system appearance was selected and implemented in R7.
+Q1/Q2/Q5/Q6 are implemented in source; Q3 portable import/verified restore is the next remaining item in the [Q1-Q7 queue](roadmap.md#next-agent-queue-q1q7), followed by Q7 and the remaining 15 user-selected priorities; Q4 is outside the revised selection. R6/R7 user follow-ups are implemented; native checks remain pending. I20 Follow system appearance was selected and implemented in R7.
 
 ## Studies
 
+The later implementation request selects N16, N14, N20, editable text diff and N18 in that order; the roadmap records implementation state and now has 20 priorities. Earlier studies preserve provenance.
+
+2026-10-17: [Desktop feature review](studies/feature-review-2026-10-17.md) evaluates all I1–I30 and Q/L work, ranks surviving ideas and adds twelve new proposals. The later user revision below supersedes this ranking; the study retains historical dispositions and scope definitions.
+
 | Topic | Date | State | Conclusion |
 | --- | --- | --- | --- |
+| [User-edited priority revision](studies/feature-priorities-2026-10-17.md) | 2026-10-17 | selected priorities; additions proposed | 15 surviving priorities retain user order; Q3 then Q7, Q4 omitted; eight further proposals N13–N20 remain unselected. |
+| [Desktop feature review](studies/feature-review-2026-10-17.md) | 2026-10-17 | historical review; ranking superseded | Every old idea classified; N1–N12 scope definitions retained. Current selection belongs to the roadmap; permanent history remains preserved. |
 | [React Native app on Entanglement + Aurora](studies/react-native-app.md) | 2026-10-13 | proposal, not started | Separate repo `archiver-mobile` (Expo 57 / RN 0.86.3), offline-only Entanglement (no backend), Aurora Reading Room theme; capture via share sheet, Process Text, paste box and opt-in clipboard-on-open; 12 prompts P0-P11 for a Sonnet agent. Does not change the desktop Q1-Q7 queue. |

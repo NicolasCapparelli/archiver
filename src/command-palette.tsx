@@ -173,6 +173,8 @@ export function CommandPalette({
   );
 }
 const shortcuts = [
+  ["Tools and library", "Ctrl + Win + 1–9 (Windows)", "Paste up to N recent clipboard records oldest to newest: text joined by line breaks, images/files as files; mixed text/file batches report an error"],
+  ["Navigation", "Ctrl + Tab / Ctrl + Shift + Tab", "Next/previous Librarian category from tabs or results"],
   ["Text and snippets", "↑ / ↓ or W / S (Snippets)", "Navigate visible group headings and snippets; WASD is Librarian-only"],
   ["Text and snippets", "← / → (Snippet groups)", "Collapse or expand the current group; A/D still switch Librarian tabs"],
   ["Text and snippets", "Enter / Space (Group heading)", "Toggle the focused snippet group"],
@@ -250,6 +252,7 @@ const shortcuts = [
     "Ctrl + Shift + N",
     "Paste Playground: scratch text with transforms, saved to the library or archive"
   ],
+  ["Text and snippets", "Ctrl + Alt + J (Full clip / Playground)", "Explore JSON values and copy exact values or JSON Pointer paths"],
   ["Text and snippets", "Ctrl + Shift + J", "Emoji catalog: search names, categories or symbols; arrows select, Enter / Shift + Enter copy, Ctrl + Enter / Ctrl + Shift + Enter paste; Ctrl + K searches"],
   [
     "Navigation",

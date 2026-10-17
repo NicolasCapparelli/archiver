@@ -12,8 +12,10 @@ export function ToolDialog({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
     ref.current?.showModal();
     ref.current?.querySelector<HTMLElement>("[data-initial-focus]")?.focus();
+    return () => { if (previous?.isConnected) previous.focus(); };
   }, []);
   return (
     <dialog

@@ -32,6 +32,9 @@ import { listen } from "@tauri-apps/api/event";
 import * as api from "./api";
 import type { Item } from "./api";
 import { ImageThumbnail, ImageDetail } from "./image-preview";
+import { RegionOcr } from "./region-ocr";
+import { JsonExplorer } from "./json-explorer";
+import { ClipNotes } from "./clip-notes";
 import {
   HistoryImport,
   IntegrationHealth,
@@ -43,7 +46,7 @@ import { ResourcePreview, DomainGroups } from "./resource-preview";
 import { SearchTools, ItemLabels } from "./search-tools";
 import { ItemActions, RenamePin } from "./item-actions";
 import { Statistics } from "./statistics";
-import { snippetGroups } from "./snippet-groups";
+import { snippetGroups, groupCollapsed } from "./snippet-groups";
 import { ClipGroups } from "./clip-groups";
 import { OcrMatch } from "./ocr-match";
 import { BulkOrganization } from "./bulk-organization";
@@ -150,12 +153,12 @@ function App() {
       value !== "" &&
       (value !== false || key === "pinned"),
   ).length;
-  const [collapsedSnippets, setCollapsedSnippets] = useState<string[]>([]);
+  const [collapsedSnippets, setCollapsedSnippets] = useState<string[] | null>(null);
   const [organizationOpen, setOrganizationOpen] = useState(false);
   const [libraryCleared, setLibraryCleared] = useState(false);
   const groups = snippetGroups(items, query ? [] : knownGroups, searchOptions.collection);
   const orderedItems = (rows: Item[]) => filter === "snippets" ? [...new Map(snippetGroups(rows, [], searchOptions.collection).flatMap(group => group.items).map(item => [item.id, item])).values()] : rows;
-  const visibleItems = filter === "snippets" ? [...new Map(groups.filter(group => !collapsedSnippets.includes(group.name)).flatMap(group => group.items).map(item => [item.id, item])).values()] : items;
+  const visibleItems = filter === "snippets" ? [...new Map(groups.filter(group => !groupCollapsed(group.name, collapsedSnippets)).flatMap(group => group.items).map(item => [item.id, item])).values()] : items;
   const listRef = useRef<HTMLDivElement>(null);
   const resultButton = (id: string | null | undefined) => {
     const rows = Array.from(listRef.current?.querySelectorAll<HTMLButtonElement>(".entry") || []).filter(row => row.dataset.itemId === id && !row.closest("[hidden]"));
@@ -179,6 +182,9 @@ function App() {
   const [toolDialog, setToolDialog] = useState<
     "filters" | "selection" | undefined
   >();
+  const [regionId, setRegionId] = useState<string>();
+  const [noteId, setNoteId] = useState<string>();
+  const [jsonText, setJsonText] = useState<string>();
   const [transformOpen, setTransformOpen] = useState(false);
   const [clipView, setClipView] = useState<null | {
     mode: "clip" | "playground";
@@ -263,7 +269,7 @@ function App() {
       setError("");
       const resetSelection = resetOnRefresh.current;
       const rowGroups = snippetGroups(rows, collectionGroups, searchOptions.collection);
-      const firstRow = filter === "snippets" ? rowGroups.find(group => group.items.length && !collapsedSnippets.includes(group.name))?.items[0] : rows[0];
+      const firstRow = filter === "snippets" ? rowGroups.find(group => group.items.length && !groupCollapsed(group.name, collapsedSnippets))?.items[0] : rows[0];
       setSelected((previous) =>
         !resetSelection && rows.some((i) => i.id === (restore?.selected ?? previous)) ? (restore?.selected ?? previous) : (firstRow?.id ?? null),
       );
@@ -285,7 +291,7 @@ function App() {
       if (resetOnRefresh.current) {
         resetOnRefresh.current = false;
         listRef.current?.scrollTo({ top: 0 });
-        if (isQuick && document.activeElement !== input.current && !document.querySelector("dialog[open]")) focusResultsAfterRefresh.current = true;
+        if (isQuick && document.activeElement !== input.current && !document.activeElement?.closest(".filter-bar") && !document.querySelector("dialog[open]")) focusResultsAfterRefresh.current = true;
       }
     } catch (e) {
       if (request === generation.current) setError(String(e));
@@ -296,7 +302,7 @@ function App() {
   useEffect(() => {
     if (!focusResultsAfterRefresh.current) return;
     focusResultsAfterRefresh.current = false;
-    if (!document.querySelector("dialog[open]") && document.activeElement !== input.current)
+    if (!document.querySelector("dialog[open]") && document.activeElement !== input.current && !document.activeElement?.closest(".filter-bar"))
       (resultButton(selected) ?? listRef.current)?.focus();
   }, [items, selected]);
   useEffect(() => {
@@ -334,6 +340,12 @@ function App() {
   }, [refresh]);
   browsingState.current = { filter, query, searchOptions, includeArchive, collapsedSnippets, selected, group: selectedGroup, scroll: listRef.current?.scrollTop ?? 0, count: items.length || 50, shellSession };
   useEffect(() => {
+    if (!api.native) return;
+    let disposed = false, stop: undefined | (() => void);
+    void listen<string>("recent-paste-error", ({ payload }) => setToast(payload)).then(fn => { if (disposed) fn(); else stop = fn; });
+    return () => { disposed = true; stop?.(); };
+  }, []);
+  useEffect(() => {
     if (!api.native || !isQuick) return;
     let disposed = false, stop: undefined | (() => void), focusEpoch = 0;
     const handleFocus = ({ payload }: { payload: boolean }) => {
@@ -347,7 +359,7 @@ function App() {
           setEmojiOpen(false);
           let saved: typeof browsingState.current | null = null;
           if (prefs.librarianStateMemory) { try { saved = JSON.parse(localStorage.getItem("archiver-librarian-state") || "null"); } catch { /* A damaged browsing cache must not block opening. */ } }
-          if (saved && filters.some(f => f.id === saved!.filter) && typeof saved.query === "string" && Array.isArray(saved.collapsedSnippets)) {
+          if (saved && filters.some(f => f.id === saved!.filter) && typeof saved.query === "string" && (saved.collapsedSnippets === null || Array.isArray(saved.collapsedSnippets))) {
             restoreState.current = { selected: saved.selected, scroll: Math.max(0, Number(saved.scroll) || 0), count: Math.max(50, Number(saved.count) || 50), group: saved.group || "" };
             resetOnRefresh.current = false;
             restoringScroll.current = true;
@@ -357,7 +369,7 @@ function App() {
             localStorage.removeItem("archiver-librarian-state");
             restoreState.current = null; resetOnRefresh.current = true;
             restoringScroll.current = false;
-            setFilter("all"); setQuery(""); setSearchOptions({}); setIncludeArchive(false); setCollapsedSnippets([]); setSelectedGroup(""); setShellSession("");
+            setFilter("all"); setQuery(""); setSearchOptions({}); setIncludeArchive(false); setCollapsedSnippets(null); setSelectedGroup(""); setShellSession("");
             listRef.current?.scrollTo({ top: 0 });
           }
           (document.activeElement as HTMLElement)?.blur(); listRef.current?.focus({ preventScroll: true });
@@ -649,7 +661,14 @@ function App() {
         setConfirmDelete(false);
         if (isQuick && api.native) void getCurrentWindow().hide();
       }
-      if (filter === "snippets" && inListContext && (!editing || inSearch) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      if (isQuick && !settings && (event.ctrlKey || event.metaKey) && event.key === "Tab" && !event.altKey) {
+        event.preventDefault();
+        const tabs = [...document.querySelectorAll<HTMLButtonElement>(".filter-bar button")];
+        const index = tabs.findIndex(tab => tab.getAttribute("aria-selected") === "true");
+        const next = tabs[nextIndex(index, event.shiftKey ? -1 : 1, tabs.length, true)];
+        next?.click(); next?.focus(); return;
+      }
+      if (filter === "snippets" && !inTabs && inListContext && (!editing || inSearch) && !event.ctrlKey && !event.metaKey && !event.altKey) {
         if (inSearch && ["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
         const current = target.closest<HTMLButtonElement>(".entry,.snippet-group-toggle");
         const section = current?.closest<HTMLElement>(".snippet-group");
@@ -662,7 +681,7 @@ function App() {
             if (event.key === "ArrowRight" && open && current === heading) section?.querySelector<HTMLButtonElement>(".entry")?.focus();
             else heading.focus();
           }
-          return;
+          if (heading) return;
         }
         if (["ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"].includes(navKey)) {
           event.preventDefault();
@@ -727,7 +746,9 @@ function App() {
                   visibleItems.length,
                 );
         setSelected(visibleItems[next]?.id ?? null);
-        if (inResults || (wasd && inTabs))
+        if (filter === "snippets" && (inResults || inTabs || inSearch))
+          listRef.current?.querySelector<HTMLButtonElement>(".snippet-group-toggle")?.focus();
+        else if (inResults || (wasd && inTabs))
           resultButton(visibleItems[next]?.id)?.focus();
       }
       if (
@@ -837,7 +858,7 @@ function App() {
           ref={input}
           autoFocus={false}
           value={query}
-          onChange={(e) => { setQuery(e.target.value); if (filter === "snippets") setCollapsedSnippets([]); }}
+          onChange={(e) => { setQuery(e.target.value); if (filter === "snippets") setCollapsedSnippets(e.target.value ? [] : null); }}
           placeholder={`Search ${filter === "all" ? "all history" : ({ clips: "clipboard", command: "commands", snippets: "snippets", pinned: "pinned items", failed: "failed commands", text: "text", image: "images", files: "files", links: "URLs" } as Record<string, string>)[filter]}${filter === "snippets" ? "" : isQuick && !includeArchive ? " in library" : " in archive"}…`}
           aria-label={
             isQuick && !includeArchive
@@ -881,7 +902,7 @@ function App() {
             aria-selected={filter === f.id}
             tabIndex={filter === f.id ? 0 : -1}
             className={filter === f.id ? "chip chosen" : "chip"}
-            onClick={() => setFilter(f.id)}
+            onClick={() => { if (f.id === "snippets") setCollapsedSnippets(query ? [] : null); setFilter(f.id); }}
           >
             {f.label}
           </button>
@@ -907,11 +928,11 @@ function App() {
       {!isQuick && filter === "snippets" && <ClipGroups selected={searchOptions.collection || ""} onSelect={collection => setSearchOptions({ ...searchOptions, collection })} onChanged={() => void refresh()} active={active?.name ? active : undefined} vault onAction={setGroupAction} action={groupAction} onClose={() => setGroupAction(undefined)} />}
       <div ref={listRef} tabIndex={-1} className={`item-list ${!isQuick && filter === "snippets" ? "vault-list" : ""}`} role="group" aria-label={filter === "snippets" ? "Snippet vault" : "History results"}>
         {filter === "snippets" ? groups.map(group => {
-          const open = !collapsedSnippets.includes(group.name);
+          const open = !groupCollapsed(group.name, collapsedSnippets);
           const id = `snippet-group-${group.name ? "named-" + encodeURIComponent(group.name) : "none"}`;
           return <section className="snippet-group" key={group.name}>
             <button className="snippet-group-toggle" data-group={group.name} aria-expanded={open} aria-controls={id} onClick={() => {
-              setCollapsedSnippets(previous => open ? [...previous, group.name] : previous.filter(name => name !== group.name));
+              setCollapsedSnippets(previous => open ? [...(previous ?? groups.map(group => group.name)), group.name] : (previous ?? groups.map(group => group.name)).filter(name => name !== group.name));
             }}><span>{open ? "▾" : "▸"} {group.name || "Ungrouped"}</span><span>{group.items.length}{more ? "+" : ""}</span></button>
             <div id={id} hidden={!open}>{group.items.map(item => renderItem(item, group.name))}{!group.items.length && <p className="snippet-group-empty">{query ? "No matching snippets" : "No snippets in this group yet"}</p>}</div>
           </section>;
@@ -990,6 +1011,9 @@ function App() {
     onExpand={draft => setClipView({ ...clipView, expanded: true, draft })}
     onSaveSnippet={text => { const item = items.find(item => item.id === clipView.item?.id); setClipView(null); setSnippetDraft({ id: item?.name ? item.id : undefined, name: item?.name || "", note: item?.note, kind: clipView.item?.kind === "command" ? "command" : "text", text }); }} onToast={setToast} />;
   const dialogs = (<>
+    {regionId && <RegionOcr key={regionId} id={regionId} onClose={() => setRegionId(undefined)} />}
+    {noteId && <ClipNotes key={noteId} id={noteId} onClose={() => setNoteId(undefined)} onSaved={() => { setToast("Note saved"); void refresh(); }} />}
+    {jsonText !== undefined && <ToolDialog title="JSON explorer" onClose={() => setJsonText(undefined)} tall><JsonExplorer text={jsonText} /></ToolDialog>}
     {emojiOpen && <Suspense fallback={<ToolDialog title="Emoji catalog" onClose={() => setEmojiOpen(false)}><p role="status">Loading emoji catalog…</p></ToolDialog>}><EmojiSelector quick={isQuick} onClose={() => setEmojiOpen(false)} onToast={setToast} /></Suspense>}
     {renamePin && <RenamePin item={renamePin} keyboardOnly={isQuick} onClose={() => setRenamePin(undefined)} onSaved={() => { setRenamePin(undefined); setToast("Pin renamed"); void refresh(); }} />}
     {organizationOpen && <ToolDialog title="Tags & collections" onClose={() => setOrganizationOpen(false)}><BulkOrganization items={items} active={active} onSaved={() => { setOrganizationOpen(false); setToast("Labels updated"); void refresh(); }} /><p>Browse labels using Filters & saved searches (Ctrl+Shift+F).</p></ToolDialog>}
@@ -998,7 +1022,11 @@ function App() {
       { label: "Open Archivist · Ctrl Alt O", run: () => void api.archive() },
       { label: "Search · Ctrl K", run: () => input.current?.focus() },
       { label: "All shortcuts · F1", run: () => setShortcutsOpen(true) },
+      ...(active?.kind === "image" ? [{ label: "Region OCR · recognize selected image area", run: () => setRegionId(active.id) }] : []),
+      ...(active && !active.name ? [{ label: "Edit clip notes", run: () => setNoteId(active.id) }] : []),
+      { label: "JSON explorer · selected text", run: () => setJsonText(prepared ?? active?.text ?? "") },
       { label: "Emoji catalog · Ctrl Shift J", run: () => setEmojiOpen(true) },
+      ...Array.from({ length: 9 }, (_, index) => ({ label: `Paste last ${index + 1} clips · Ctrl Win ${index + 1}`, run: () => void action(() => api.pasteRecent(index + 1), "Recent clips pasted") })),
       { label: "Filters & saved searches · Ctrl Shift F", run: () => setToolDialog("filters") },
       { label: "Combine clips & paste queue · Ctrl Shift Q", run: () => setToolDialog("selection") },
       { label: "Tags & collections · Ctrl Shift G", run: () => setOrganizationOpen(true) },
@@ -1206,6 +1234,7 @@ function App() {
               }
               onClick={() => {
                 setSettings(false); setStatisticsOpen(false); setGroupAction(undefined); setSearchOptions({}); setQuery(""); resetOnRefresh.current = true;
+                if (f.id === "snippets") setCollapsedSnippets(null);
                 setFilter(f.id);
               }}
             >
@@ -1481,8 +1510,12 @@ function App() {
                           onPrepared={setPrepared}
                         />
                       )}
+                    {!active.name && active.note && <section className="snippet-note"><h3>Clip note</h3><p>{active.note}</p></section>}
                     {active.name && active.note && <section className="snippet-note"><h3>Note</h3><p>{active.note}</p></section>}
                     <div className="detail-actions">
+                      {!active.name && <button className="secondary" onClick={() => setNoteId(active.id)}>Edit clip notes</button>}
+                      {active.kind === "image" && <button className="secondary" onClick={() => setRegionId(active.id)}>Region OCR</button>}
+                      {!["image", "files"].includes(active.kind) && <button className="secondary" onClick={() => setJsonText(prepared ?? active.text)}>JSON explorer</button>}
                       {!active.name && (
                         <button
                           className="secondary"

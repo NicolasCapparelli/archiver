@@ -4,7 +4,49 @@ Owns selected next work, sequence and acceptance. Possibilities without a commit
 
 2026-10-14 documentation pass: root README now introduces implemented behavior for GitHub readers; no capabilities or priorities changed. Q3 remains next and native checks remain open. Two browser-demo screenshots were captured after explicit permission; they do not validate native behavior. Verification evidence: [setup](../developer/setup.md#documentation-verification-2026-10-14).
 
+## Current user-selected priorities (2026-10-17 revision)
+
+The user's implementation request promotes five tools above the previous 15-feature list, preserving both orders. Implement these five now and commit after each two or three implementations. The first three are implemented as R15; editable text diff and extractors follow as the second batch. The remaining backlog resumes at Q3. This supersedes earlier Q3-first sequences; stable Q IDs and acceptance stay available. [Original revision and proposal definitions](studies/feature-priorities-2026-10-17.md).
+
+| Priority | Feature | State / reference |
+| --- | --- | --- |
+| 1 | Region OCR | N16; implemented R15, native H21 pending |
+| 2 | JSON explorer, including Paste Playground | N14; implemented R15, native H21 pending |
+| 3 | Notes on archived clips | N20; implemented R15, native H21 pending |
+| 4 | Text diff tool with editable left/right inputs and highlighted differences | R16; next implementation |
+| 5 | Text extractors | N18; selected, not yet implemented |
+| 6 | Portable import and verified restore | Q3 |
+| 7 | Diagnostics and storage/capture health | Q7, I8, I18 |
+| 8 | Clipboard compatibility improvements | I10, L5 |
+| 9 | Typed search filters and proper directory matching | I5, I6 |
+| 10 | Playground draft recovery | N2 |
+| 11 | On-demand paste inspector: destination, invisible characters, line endings | I29 |
+| 12 | Paste text as a .txt, .json or .csv file | N3 |
+| 13 | Saved sequences of text transformations | N4 |
+| 14 | Searchable symbols: arrows, mathematics, typography | I26 |
+| 15 | Emoji favorites and recents | I30 |
+| 16 | Locate and repair missing file references | N6 |
+| 17 | Per-app paste preferences | N8 |
+| 18 | Project-aware snippet and command suggestions | I11, I27 |
+| 19 | Date, time and UUID template fields | N9 |
+| 20 | Crop/rotate images and copy the edited version | N12 |
+
+N references retain their scope definitions in the [original review](studies/feature-review-2026-10-17.md). Omitted features are outside the active selection: scheduled backups (Q4), snippet version history (N1), timed pause (N5), selected-record bundles (N7), related-variant comparison (N10), saved-search slots (N11) and encryption (I15). Preserve them as provenance; omission does not establish permanent rejection. N14, N16, N18 and N20 are now selected by the user; N13, N15, N17 and N19 remain unselected.
+
 ## Implemented, awaiting human verification
+
+### R15: Region OCR, JSON explorer and archive notes
+- Implemented 2026-10-17, first three tools in the user's promoted queue. Region OCR uses normalized backend-validated rectangles mapped from original pixels, original image decoding limits, shared OCR busy guard and existing Windows worker. Result is ephemeral and explicitly copied; no full-image OCR/index mutation.
+- JSON explorer appears in the palette/details and in Full clip/Paste Playground through Ctrl+Alt+J (Archivist button too). Strict parsing, exact source slices for values, escaped JSON Pointers and expandable rows; one million input characters and 2,000 tree rows. Large numeric literals are preserved.
+- Clip notes are separate metadata, editable via details/palette with Ctrl+S. Literal/fuzzy search, restart, export, backup and deletion recovery preserve them without modifying payloads, revisions or identity; empty saves remove the note.
+- Native visual/interaction check H21 pending; no UI automation or installer. Editable diff and extractors are next; no work on Q3 this batch.
+
+
+### R14: Collapsed snippet defaults, category focus and recent batch paste
+- Implemented 2026-10-17 from the user's follow-up: fresh snippet visits default all groups closed, query reveals matching sections, opt-in browsing memory still restores saved collapse state. Tab Left/Right and Ctrl+Tab/Ctrl+Shift+Tab preserve category navigation; Down enters group headings, refresh respects tab focus.
+- Windows original-image replay adds a full-resolution cached PNG file-drop representation for Explorer, keeping image formats. Ctrl+Win+1–9 / palette snapshots up to N distinct recent clipboard records, oldest to newest: one newline-joined text paste or one image/file drop; mixed batches fail without partial input. Excludes shell commands/snippets, independent of queue and library visibility. Focus/modifier/terminal checks retained; registration conflicts reported.
+- Frontend build/typecheck, 19 UI tests, Rust check and 59 Rust tests pass (2 ignored). Native H20 pending; no computer control or installer. Existing Reading Room components/hints reused.
+- User-requested backlog triage is in the [ranked feature review](studies/feature-review-2026-10-17.md): its priority order is now superseded by the current user-selected priorities above; the original twelve proposal definitions remain useful. Execution/automation and automatic pruning leave the active direction; sync/AI/remote remain deferred, Ctrl+R explicitly held. These proposals are not implemented.
 
 ### R13: Keyboard navigation, details reconciliation and text find
 - Implemented 2026-10-14 from follow-up feedback: selected Archivist details now use a keyed subtree and distinct preview/transform/timeline keys. R12 sizing/reset alone failed in user testing; native accumulation recheck remains H19.
@@ -62,7 +104,7 @@ State of R1-R4 (the user's 2026-10-13 request): **implemented in source**; build
 <a id="next-agent-queue-q1q7"></a>
 ## Next-agent queue (Q1-Q7)
 
-Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9-H13. Q3, Q4 and Q7 remain **planned, not implemented**. I20 system appearance is also implemented. Next queued task is Q3. Migrated from the 2026-10-12 HANDOFF.md: Q1-Q2 were its "required" tasks, Q3-Q7 its five "selected roadmap extensions", to be done in this order. Preserve everything listed in [behavior to preserve](../developer/implemented-features.md#behavior-to-preserve-from-the-2026-10-12-handoff). Delivery expectations for each: report actual test results and limitations; build no-bundle executables when useful (`npm run launch`), avoid installer churn; update the feature catalog and documents with completed behavior; leave unfinished tasks here; give the user a short next-step list. Do not enable startup, modify real shell profiles or delete real user history to test; use isolated data.
+Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9-H13. Q3 and Q7 remain **selected, not implemented**; Q4 is outside the current selection. I20 system appearance is also implemented. The promoted five-tool sequence above takes precedence; after it, Q3 then Q7 resume. Stable Q IDs and acceptance are retained from the 2026-10-12 HANDOFF.md; their original numeric order no longer defines priority. Preserve everything listed in [behavior to preserve](../developer/implemented-features.md#behavior-to-preserve-from-the-2026-10-12-handoff). Delivery expectations for each: report actual test results and limitations; build no-bundle executables when useful (`npm run launch`), avoid installer churn; update the feature catalog and documents with completed behavior; leave unfinished tasks here; give the user a short next-step list. Do not enable startup, modify real shell profiles or delete real user history to test; use isolated data.
 
 ### Q1: Undo library clearing
 - State: **implemented 2026-10-13**. `library_clear_snapshot` stores the latest nonempty clear transactionally, survives restart and merges into current membership. Deleted IDs cascade out; repeat undo is idempotent. F1, palette, Ctrl+Shift+Z and the post-clear Undo banner expose it. CLI `library undo-clear` and stdio `undo_library_clear` share the behavior. Full SQLite backups preserve the snapshot; portable JSONL exports and individual deletion recovery intentionally omit it (visibility undo belongs to the source archive). Isolated Rust/CLI tests pass; native H10 pending.
@@ -80,6 +122,7 @@ Q1, Q2, Q5 and Q6 **implemented in source 2026-10-13**, native checks pending H9
 - Extend existing JSONL export/SQLite verification into a usable import/restore flow. Validate schema, checksums, limits, references and preview counts before mutations. Portable import merges transactionally and idempotently and preserves Unicode, representations, occurrences, snippets, labels, OCR and library scopes. Full backup replacement needs a concrete preview and user approval, a pre-restore backup, closed DB handles/worker coordination and rollback. `settings.json` is outside the database: state explicitly what is restored. Test corrupt files, repeat imports, older supported formats, partial failure and active capture. (Currently export-import and automatic restore are not implemented.)
 
 ### Q4: Opt-in scheduled verified backups
+- State: outside the active selection after the user's 2026-10-17 edited list; acceptance retained for possible reconsideration.
 - Configured destination, interval, last/next status and manual run; disabled by default. Use existing consistent-snapshot verification, unique filenames and one job at a time; report disk/permission/verification failures. Keep every backup by default; any retention/deletion must be explicitly configured and restricted to files this feature generated. Test schedule persistence, pause/restart behavior and no overwrites.
 
 ### Q5: Tags and collections in Librarian, with bulk organization
