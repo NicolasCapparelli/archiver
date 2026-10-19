@@ -195,6 +195,10 @@ impl Store {
             return Err("A clip cannot be empty".into());
         }
         let tx = self.conn.transaction().map_err(err)?;
+        let calculation: bool = tx.query_row("SELECT EXISTS(SELECT 1 FROM representations WHERE item_id=? AND format=?)", params![id, crate::calculator::FORMAT], |r| r.get(0)).map_err(err)?;
+        if calculation {
+            return Err("Saved calculations are immutable. Reuse the expression in Calculator, or save as a new text clip.".into());
+        }
         let (kind, old): (String, String) = tx
             .query_row("SELECT kind,text FROM items WHERE id=?", [id], |r| {
                 Ok((r.get(0)?, r.get(1)?))
@@ -272,7 +276,7 @@ impl Store {
         tx.commit().map_err(err)?;
         Ok(count)
     }
-    fn capture_tx(tx: &rusqlite::Transaction<'_>, capture: &Capture) -> Result<bool> {
+    pub(crate) fn capture_tx(tx: &rusqlite::Transaction<'_>, capture: &Capture) -> Result<bool> {
         if !["text", "image", "files", "rich", "command"].contains(&capture.kind.as_str()) {
             return Err("Unsupported item kind".into());
         }
@@ -414,7 +418,7 @@ impl Store {
             LEFT JOIN command_results result ON result.session=e.session AND result.sequence=e.sequence
             LEFT JOIN fuzzy ranked ON ranked.id=i.id
             WHERE (:query='' OR i.title LIKE :pattern ESCAPE '\\' OR EXISTS(SELECT 1 FROM item_notes WHERE item_id=i.id AND note LIKE :pattern ESCAPE '\\') OR i.text LIKE :pattern ESCAPE '\\' OR e.directory LIKE :pattern ESCAPE '\\' OR e.source LIKE :pattern ESCAPE '\\' OR EXISTS(SELECT 1 FROM links WHERE item_id=i.id AND title LIKE :pattern ESCAPE '\\') OR EXISTS(SELECT 1 FROM image_text WHERE item_id=i.id AND text LIKE :pattern ESCAPE '\\'))
-            AND (:view='all' OR (:view='pinned' AND i.pinned=1) OR (:view='clips' AND i.kind!='command') OR i.kind=:view OR (:view='links' AND EXISTS(SELECT 1 FROM links WHERE item_id=i.id)) OR (:view='failed' AND EXISTS(SELECT 1 FROM events failures JOIN command_results failed ON failed.session=failures.session AND failed.sequence=failures.sequence WHERE failures.item_id=i.id AND failed.successful=0)))
+            AND (:view='all' OR (:view='pinned' AND i.pinned=1) OR (:view='clips' AND i.kind!='command') OR (:view='clipboard_recent' AND i.kind!='command' AND NOT EXISTS(SELECT 1 FROM representations WHERE item_id=i.id AND format='application/vnd.archiver.calculation+json')) OR i.kind=:view OR (:view='links' AND EXISTS(SELECT 1 FROM links WHERE item_id=i.id)) OR (:view='failed' AND EXISTS(SELECT 1 FROM events failures JOIN command_results failed ON failed.session=failures.session AND failed.sequence=failures.sequence WHERE failures.item_id=i.id AND failed.successful=0)))
             AND (:kind='' OR i.kind=:kind) AND (:pinned IS NULL OR i.pinned=:pinned)
             AND (:library=0 OR EXISTS(SELECT 1 FROM library WHERE item_id=i.id))
             AND (:ids='' OR i.id IN(SELECT id FROM fuzzy))
@@ -622,7 +626,7 @@ impl Store {
         }
         let mut stmt = self
             .conn
-            .prepare("SELECT format,data FROM representations WHERE item_id=? ORDER BY format")
+            .prepare("SELECT format,data FROM representations WHERE item_id=? AND format NOT IN ('application/vnd.archiver.calculation+json','application/vnd.archiver.calculation-submission') ORDER BY format")
             .map_err(err)?;
         let result = stmt
             .query_map([id], |r| {

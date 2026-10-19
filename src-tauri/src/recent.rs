@@ -15,7 +15,7 @@ pub fn snapshot(store: &Store, count: usize) -> Result<Vec<Clip>> {
     if !(1..=9).contains(&count) {
         return Err("Choose 1–9 recent clips".into());
     }
-    let mut rows = store.list("", "clips", count as i64, 0)?;
+    let mut rows = store.list("", "clipboard_recent", count as i64, 0)?;
     if rows.is_empty() {
         return Err("No clipboard clips in history".into());
     }

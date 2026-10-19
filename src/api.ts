@@ -71,6 +71,21 @@ export async function archive() {
   else location.search = "";
 }
 export const native = isTauri();
+export interface SavedCalculation {
+  id: string;
+  timestamp: number;
+  calculation: import("./calculator-engine").CalculationInput & { version: number; result: number };
+}
+let previewCalculations: SavedCalculation[] = [];
+export async function calculatorHistory(offset = 0): Promise<SavedCalculation[]> {
+  return native ? invoke("calculator_history", { offset }) : previewCalculations.slice(offset, offset + 50);
+}
+export async function saveCalculation(calculation: SavedCalculation["calculation"]): Promise<SavedCalculation> {
+  if (native) return invoke("save_calculation", { calculation });
+  const row = { id: crypto.randomUUID(), timestamp: Date.now(), calculation: structuredClone(calculation) };
+  previewCalculations.unshift(row);
+  return row;
+}
 const now = Date.now();
 const sample = (
   id: string,

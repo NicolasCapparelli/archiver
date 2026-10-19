@@ -1,5 +1,7 @@
 # Ideas and possibilities
 
+2026-10-19 calculator brainstorming: [five improvement suggestions](studies/librarian-calculator.md#suggestions-not-selected-for-implementation) cover keyboard expression recall, math-aware editing/display, draft/context recovery, function/variable completion and named calculation sheets. Originally proposals after R20; the user selected recall, natural math editing, recovery and completion plus last-result copy in R22, now implemented. Named calculation sheets remain unselected. See the living plan for current evidence; priority 8 remains next.
+
 **Later user selection (2026-10-17):** Region OCR (N16), JSON explorer including Paste Playground (N14), archive notes (N20), editable left/right text diff and extractors (N18) are now the first five implementation priorities, with commits every two or three implementations. The roadmap owns current state. Other suggestions remain unselected; earlier proposal statements below are historical.
 
 

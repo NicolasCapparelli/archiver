@@ -4,11 +4,13 @@ export function ToolDialog({
   onClose,
   children,
   tall,
+  className = "",
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
   tall?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -20,7 +22,7 @@ export function ToolDialog({
   return (
     <dialog
       ref={ref}
-      className={`edit-dialog tool-dialog ${tall ? "tall" : ""}`}
+      className={`edit-dialog tool-dialog ${tall ? "tall" : ""} ${className}`}
       aria-label={title}
       onClose={event => { if (event.target === event.currentTarget) onClose(); }}
     >

@@ -82,6 +82,18 @@ fn save_clip_note(app: tauri::AppHandle, state: tauri::State<State>, id: String,
     app.emit("archive-changed", ()).map_err(|e| e.to_string())
 }
 struct OcrJob(Arc<AtomicBool>);
+#[tauri::command]
+fn calculator_history(state: tauri::State<State>, offset: i64) -> Result<Vec<archiver_core::calculator::SavedCalculation>, String> {
+    lock(&state.store)?.calculations(offset)
+}
+#[tauri::command]
+fn save_calculation(app: tauri::AppHandle, state: tauri::State<State>, calculation: archiver_core::calculator::Calculation) -> Result<archiver_core::calculator::SavedCalculation, String> {
+    let now = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis() as i64;
+    let saved = lock(&state.store)?.save_calculation(calculation, now)?;
+    // Persistence already succeeded: an event failure must not invite a duplicate retry.
+    let _ = app.emit("archive-changed", ());
+    Ok(saved)
+}
 impl Drop for OcrJob {
     fn drop(&mut self) {
         self.0.store(false, Ordering::SeqCst);
@@ -707,7 +719,7 @@ fn save_settings(
         .map_err(|e| format!("Invalid stored shortcut: {e}"))?;
     let changed = shortcut != old;
     if cfg!(windows) && changed && (1..=9).any(|count| recent_shortcut(count) == shortcut) {
-        return Err("Ctrl+Win+1–9 are reserved for pasting recent clips. Choose another Librarian shortcut.".into());
+        return Err("Ctrl+Alt+1–9 are reserved for pasting recent clips. Choose another Librarian shortcut.".into());
     }
     // Reserve the new key first, so a conflict leaves the existing shortcut working.
     if changed {
@@ -1104,7 +1116,7 @@ fn overwrite_clip(
 fn recent_shortcut(count: usize) -> tauri_plugin_global_shortcut::Shortcut {
     use tauri_plugin_global_shortcut::{Code, Modifiers, Shortcut};
     Shortcut::new(
-        Some(Modifiers::CONTROL | Modifiers::SUPER),
+        Some(Modifiers::CONTROL | Modifiers::ALT),
         [
             Code::Digit1,
             Code::Digit2,
@@ -1117,6 +1129,19 @@ fn recent_shortcut(count: usize) -> tauri_plugin_global_shortcut::Shortcut {
             Code::Digit9,
         ][count - 1],
     )
+}
+#[cfg(test)]
+mod recent_shortcut_tests {
+    #[test]
+    fn all_recent_paste_chords_use_control_alt_and_release_the_old_chords() {
+        use tauri_plugin_global_shortcut::{Modifiers, Shortcut};
+        for count in 1..=9 {
+            let current = super::recent_shortcut(count);
+            assert_eq!(current.mods, Modifiers::CONTROL | Modifiers::ALT);
+            assert_eq!(current, format!("Ctrl+Alt+Digit{count}").parse::<Shortcut>().unwrap());
+            assert_ne!(current, format!("Ctrl+Super+Digit{count}").parse::<Shortcut>().unwrap());
+        }
+    }
 }
 #[tauri::command]
 async fn paste_recent(app: tauri::AppHandle, count: usize) -> Result<(), String> {
@@ -1516,6 +1541,8 @@ fn main() {
             recognize_image_region,
             clip_note,
             save_clip_note,
+            calculator_history,
+            save_calculation,
             scan_image_text,
             pin_item,
             rename_item,
@@ -1743,7 +1770,7 @@ fn main() {
                 if let Err(e) = app.global_shortcut().register(recent_shortcut(count)) {
                     if let Ok(mut error) = app.state::<State>().error.lock() {
                         let previous = error.take().unwrap_or_default();
-                        *error = Some(format!("{previous} Recent paste Ctrl+Win+{count} unavailable: {e}. Use the command palette."));
+                        *error = Some(format!("{previous} Recent paste Ctrl+Alt+{count} unavailable: {e}. Use the command palette."));
                     }
                 }
             }

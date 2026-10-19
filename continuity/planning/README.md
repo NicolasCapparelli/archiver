@@ -10,6 +10,8 @@ Q1/Q2/Q3/Q5/Q6/Q7 are implemented in source. The [20-priority list](roadmap.md#c
 
 ## Studies
 
+2026-10-19: [Librarian calculator living plan](studies/librarian-calculator.md), selected/implemented R18 foundation, R19 screenshot-driven UI refinement and R20 Enter-focus fix and R21 inline expanded feature view matching Paste Playground ahead of priority 8: fixed keypad below an expression/answer sheet, permanent saved context and local Clear versus Archive; Ctrl+Alt+1–9 replaces recent-paste chords. Concrete steps, automated evidence and pending native H25/H26 stay in the plan. R22 implements last-result copy, history/draft recall, natural math editing, recovery and completion/hints; native H27 remains pending and commit/push is explicitly authorized. Remaining 20-priority order is unchanged.
+
 The later implementation request selects N16, N14, N20, editable text diff and N18 in that order; the roadmap records implementation state and now has 20 priorities. All five are implemented in R15–R16; H21/H22 are pending. R17 also completes Q3/Q7 with H23/H24 pending; clipboard compatibility is next. Earlier studies preserve provenance.
 
 2026-10-17: [Desktop feature review](studies/feature-review-2026-10-17.md) evaluates all I1–I30 and Q/L work, ranks surviving ideas and adds twelve new proposals. The later user revision below supersedes this ranking; the study retains historical dispositions and scope definitions.

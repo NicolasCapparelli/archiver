@@ -34,6 +34,7 @@ import type { Item } from "./api";
 import { ImageThumbnail, ImageDetail } from "./image-preview";
 import { TextDiffTool } from "./text-diff-tool";
 import { TextExtractTool } from "./text-extract-tool";
+const Calculator = lazy(() => import("./calculator").then(module => ({ default: module.Calculator })));
 import { RegionOcr } from "./region-ocr";
 import { JsonExplorer } from "./json-explorer";
 import { ClipNotes } from "./clip-notes";
@@ -188,6 +189,7 @@ function App() {
   const [noteId, setNoteId] = useState<string>();
   const [textUtility, setTextUtility] = useState<{ kind: "diff" | "extract"; text: string }>();
   const [jsonText, setJsonText] = useState<string>();
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [transformOpen, setTransformOpen] = useState(false);
   const [clipView, setClipView] = useState<null | {
     mode: "clip" | "playground";
@@ -205,7 +207,7 @@ function App() {
           text: prepared ?? active.text,
         }
       : undefined;
-  const expandedView = isQuick && clipView?.expanded === true;
+  const expandedView = isQuick && (calculatorOpen || clipView?.expanded === true);
   useEffect(() => {
     if (!expandedView) return;
     void api.setQuickExpanded(true).catch(() => {});
@@ -359,7 +361,7 @@ function App() {
           ++generation.current;
           setPreferences(prefs);
           setClipView(null); setSnippetDraft(undefined); setRenamePin(undefined); setToolDialog(undefined); setTransformOpen(false); setTemplateDialog(false); setPalette(false); setShortcutsOpen(false); setOrganizationOpen(false); setConfirmDelete(false);
-          setEmojiOpen(false); setRegionId(undefined); setNoteId(undefined); setJsonText(undefined); setTextUtility(undefined);
+          setEmojiOpen(false); setRegionId(undefined); setNoteId(undefined); setJsonText(undefined); setTextUtility(undefined); setCalculatorOpen(false);
           let saved: typeof browsingState.current | null = null;
           if (prefs.librarianStateMemory) { try { saved = JSON.parse(localStorage.getItem("archiver-librarian-state") || "null"); } catch { /* A damaged browsing cache must not block opening. */ } }
           if (saved && filters.some(f => f.id === saved!.filter) && typeof saved.query === "string" && (saved.collapsedSnippets === null || Array.isArray(saved.collapsedSnippets))) {
@@ -380,6 +382,7 @@ function App() {
       } else {
         localStorage.setItem("archiver-librarian-state", JSON.stringify({ ...browsingState.current, scroll: listRef.current?.scrollTop ?? browsingState.current.scroll }));
         setClipView(view => view?.expanded ? null : view);
+        setCalculatorOpen(false);
         void getCurrentWindow().hide();
       }
     };
@@ -543,10 +546,14 @@ function App() {
         if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
           event.preventDefault();
           setClipView(null);
+          setCalculatorOpen(false);
         }
         return;
       }
       if (document.querySelector("dialog[open]")) return;
+      if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey && event.code === "KeyM") {
+        event.preventDefault(); setCalculatorOpen(true); return;
+      }
       if (event.ctrlKey && event.shiftKey && !event.altKey && event.code === "KeyJ") {
         event.preventDefault(); setEmojiOpen(true); return;
       }
@@ -1014,6 +1021,7 @@ function App() {
     onExpand={draft => setClipView({ ...clipView, expanded: true, draft })}
     onSaveSnippet={text => { const item = items.find(item => item.id === clipView.item?.id); setClipView(null); setSnippetDraft({ id: item?.name ? item.id : undefined, name: item?.name || "", note: item?.note, kind: clipView.item?.kind === "command" ? "command" : "text", text }); }} onToast={setToast} />;
   const dialogs = (<>
+    {!isQuick && calculatorOpen && <Suspense fallback={<p role="status">Loading calculator…</p>}><Calculator onClose={() => setCalculatorOpen(false)} /></Suspense>}
     {textUtility && <ToolDialog title={textUtility.kind === "diff" ? "Text diff" : "Text extractors"} tall onClose={() => setTextUtility(undefined)}>{textUtility.kind === "diff" ? <TextDiffTool initialText={textUtility.text} /> : <TextExtractTool initialText={textUtility.text} />}</ToolDialog>}
     {regionId && <RegionOcr key={regionId} id={regionId} onClose={() => setRegionId(undefined)} />}
     {noteId && <ClipNotes key={noteId} id={noteId} onClose={() => setNoteId(undefined)} onSaved={() => { setToast("Note saved"); void refresh(); }} />}
@@ -1032,7 +1040,8 @@ function App() {
       { label: "Text extractors · URLs, emails, paths and regex", run: () => setTextUtility({ kind: "extract", text: prepared ?? active?.text ?? "" }) },
       { label: "JSON explorer · selected text", run: () => setJsonText(prepared ?? active?.text ?? "") },
       { label: "Emoji catalog · Ctrl Shift J", run: () => setEmojiOpen(true) },
-      ...Array.from({ length: 9 }, (_, index) => ({ label: `Paste last ${index + 1} clips · Ctrl Win ${index + 1}`, run: () => void action(() => api.pasteRecent(index + 1), "Recent clips pasted") })),
+      { label: "Scientific calculator · saved worksheets · Ctrl Shift M", run: () => setCalculatorOpen(true) },
+      ...Array.from({ length: 9 }, (_, index) => ({ label: `Paste last ${index + 1} clips · Ctrl Alt ${index + 1}`, run: () => void action(() => api.pasteRecent(index + 1), "Recent clips pasted") })),
       { label: "Filters & saved searches · Ctrl Shift F", run: () => setToolDialog("filters") },
       { label: "Combine clips & paste queue · Ctrl Shift Q", run: () => setToolDialog("selection") },
       { label: "Tags & collections · Ctrl Shift G", run: () => setOrganizationOpen(true) },
@@ -1133,19 +1142,19 @@ function App() {
       )}
     </>
   );
-  if (expandedView && clipView)
+  if (expandedView)
     return (
       <div className="quick-shell expanded-shell">
         <header>
           <span className="brand">
             <ArchiverMark size={24} />
-            {clipView.mode === "playground" ? "Paste Playground" : "Full clip"}
+            {calculatorOpen ? "Calculator" : clipView?.mode === "playground" ? "Paste Playground" : "Full clip"}
           </span>
           <span className="esc-hint">
             <kbd>Esc</kbd> back to Librarian
           </span>
         </header>
-        {workbench(true)}
+        {calculatorOpen ? <Suspense fallback={<p role="status">Loading calculator…</p>}><Calculator expanded onClose={() => setCalculatorOpen(false)} /></Suspense> : workbench(true)}
         {toast && (
           <div className="toast" role="status">
             <Check size={16} />
