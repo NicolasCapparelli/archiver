@@ -2,6 +2,11 @@
 
 Newest first. Keep at most 10 entries and about 2,000 words; archive older entries under `history/implementation/YYYY-MM.md`. Archived early turns: [October 2026](history/implementation/2026-10.md).
 
+## 2026-10-19: Calculator publication approved and completed
+
+- **Published**: user explicitly approved repository transfer to `https://github.com/NicolasCapparelli/archiver.git` main. Push succeeded through `c435685`, including implementation `d1d3868`. Status updated to remove the resolved approval blocker. No runtime change or additional tests required; previous R22 verification applies.
+- **Human checks**: H25/H26/H27 remain pending. Run `npm run launch` and verify calculator editing, focus, recovery and shortcuts as recorded below. No UI automation, launch or installer performed.
+
 ## 2026-10-19 (R22): Natural calculator editing, recall and recovery
 
 - **Implemented**: all five requested additions in `calculator.tsx`, `calculator-math-field.tsx` and `calculator-editing.ts`. Locally bundled MathLive provides editable fractions/powers/roots and formatted saved rows; bounded conversion keeps existing archive records compatible. Ctrl+Shift+C copies the last saved result. Up/Down recalls original row context across history pages and Down restores the unfinished draft; closing while recalling preserves that draft. Local versioned recovery restores input, variables, ans and DEG/RAD, including successful saves completed after closing. Function/variable suggestions accept Tab, function templates pair parentheses, and argument hints describe supported signatures. Existing save focus guard, feature-only expansion and permanent-history Clear semantics retained. Calculator/editor assets load on demand.
