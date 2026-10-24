@@ -6,7 +6,7 @@ Open Sketchpad from Librarian into Expanded Librarian. Draw simple sketches and 
 
 - **Source/date:** user request, 2026-10-23. Required tools: freehand, strict lines/shapes, text, select/drag, eraser, undo/redo, image copy.
 - **Authorization:** user approved implementation, then requested UI repairs and named local sketches. Latest request authorizes icon controls, Ctrl+Shift+D, milestone completion, commit and push.
-- **State:** V1 implementation milestone closed at user request on 2026-10-23. H38 remains an unverified native follow-up. Owner: `archiver-sketchpad-20261023-01`. Publication authorized and staged for review. Committing agent and SHA pending actual commit.
+- **State:** V1 implementation milestone closed at user request on 2026-10-23. H38 remains an unverified native follow-up. Owner: `archiver-sketchpad-20261023-01`. Source commit: `f68a1c9`. Committing agent: `archiver-sketchpad-20261023-01`.
 - **Planning owner:** `archiver-sketchpad-plan-20261023-01`, documentation only.
 - **Selection:** [roadmap](../../planning/roadmap.md#sk1-sketchpad-v1). FS1 remains independent.
 - **Location:** user-requested `continuity/milestones/`. The original path retains a stable link to this final ledger.
@@ -66,16 +66,16 @@ Runtime owner: `archiver-sketchpad-20261023-01`.
 
 | ID | Outcome | State | Implementing agent | Commit state | Committing agent | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| SK1.0 | Scope/live plan | done | archiver-sketchpad-plan-20261023-01 | uncommitted | none | This plan |
-| SK1.1 | Model/bounds | done | archiver-sketchpad-20261023-01 | uncommitted | none | Model tests |
-| SK1.2 | Shell/creation | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Source, H38 |
-| SK1.3 | Selection/drag/eraser | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Geometry tests, H38 |
-| SK1.4 | History/recovery | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | History tests, H38 |
-| SK1.5 | Image copy/capture | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Native tests, H38 |
-| SK1.7 | Workspace repairs | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Viewport/text tests, H38 |
-| SK1.8 | Fit/controls/saved sketches/review | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Storage tests, H38 |
-| SK1.9 | Icon control row and opening shortcut | implemented-awaiting-check | archiver-sketchpad-20261023-01 | uncommitted | none | Latest user request |
-| SK1.6 | Delivery/docs, native follow-up transferred | done | archiver-sketchpad-20261023-01 | uncommitted | none | Helpers pass, H38 pending |
+| SK1.0 | Scope/live plan | done | archiver-sketchpad-plan-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | This plan |
+| SK1.1 | Model/bounds | done | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Model tests |
+| SK1.2 | Shell/creation | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Source, H38 |
+| SK1.3 | Selection/drag/eraser | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Geometry tests, H38 |
+| SK1.4 | History/recovery | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | History tests, H38 |
+| SK1.5 | Image copy/capture | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Native tests, H38 |
+| SK1.7 | Workspace repairs | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Viewport/text tests, H38 |
+| SK1.8 | Fit/controls/saved sketches/review | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Storage tests, H38 |
+| SK1.9 | Icon control row and opening shortcut | implemented-awaiting-check | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Latest user request |
+| SK1.6 | Delivery/docs, native follow-up transferred | done | archiver-sketchpad-20261023-01 | f68a1c9 | archiver-sketchpad-20261023-01 | Helpers pass, H38 pending |
 
 ### Latest implementation completions
 
@@ -103,7 +103,7 @@ Implementation delivered. Publication authorized. Native control-row and shortcu
 
 Scoped staged-snapshot build/typecheck and 54 frontend helpers pass. The full working tree also passes build and 74 helpers. The existing bundle-size warning remains.
 The scoped staged-snapshot Rust check passes. Rust library tests pass: 75 passed, three opt-in tests ignored.
-No UI automation, native launch or installer. Commit/push status is recorded after publication.
+No UI automation, native launch or installer. Source is committed as `f68a1c9`.
 
 [H38](../../status.md#pending-human-checks) owns actions, expected results, reported failures and pending native retest.
 Run `npm run launch`. Test Fit/Canvas after pan/zoom, both themes/scaling, wrapped hints, properties, saved A/B lifecycle, unsaved-switch cancellation, drawing/text/history and paste into two apps.

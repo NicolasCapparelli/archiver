@@ -1,7 +1,7 @@
 # SK1: Sketchpad V1 — implementation complete
 
 Closed at the user's request on 2026-10-23. Implementing agent: `archiver-sketchpad-20261023-01`.
-Publication is authorized. The commit record will be added after the commit succeeds.
+Source commit: `f68a1c9`. Committing agent: `archiver-sketchpad-20261023-01`. Publication is authorized.
 
 One compact icon control row has descriptive tooltips. Ctrl+Shift+D opens Sketchpad in Librarian.
 Named sketches, drawing, text, selection, erasing, history, zoom/pan and image copy are implemented.

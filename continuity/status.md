@@ -1,6 +1,6 @@
 # Status
 
-2026-10-23 SK1.9 completes Sketchpad V1 implementation at the user's request. One compact icon control row replaces text action rows. Tooltips describe actions. Ctrl+Shift+D opens Sketchpad in Librarian. V1 is ready for publication. H38 remains a pending native follow-up. No next implementation is selected.
+2026-10-23 SK1.9 completes Sketchpad V1 implementation at the user's request. One compact icon control row replaces text action rows. Tooltips describe actions. Ctrl+Shift+D opens Sketchpad in Librarian. V1 source is committed as `f68a1c9`. H38 remains a pending native follow-up. No next implementation is selected.
 
 Startup snapshot. Capability baseline: [implemented features](developer/implemented-features.md); dated verification narrative: [history](history/status-2026-10-12.md).
 
