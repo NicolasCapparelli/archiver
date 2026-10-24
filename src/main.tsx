@@ -1,3 +1,5 @@
+import { Sketchpad } from "./sketchpad";
+import { isSketchpadShortcut } from "./sketchpad-shortcuts";
 import React, {
   useCallback,
   useEffect,
@@ -189,6 +191,7 @@ function App() {
   const [noteId, setNoteId] = useState<string>();
   const [textUtility, setTextUtility] = useState<{ kind: "diff" | "extract"; text: string }>();
   const [jsonText, setJsonText] = useState<string>();
+  const [sketchpadOpen, setSketchpadOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [transformOpen, setTransformOpen] = useState(false);
   const [clipView, setClipView] = useState<null | {
@@ -207,7 +210,9 @@ function App() {
           text: prepared ?? active.text,
         }
       : undefined;
-  const expandedView = isQuick && (calculatorOpen || clipView?.expanded === true);
+  const expandedView = isQuick && (sketchpadOpen || calculatorOpen || clipView?.expanded === true);
+  const sketchpadOpenRef = useRef(false);
+  sketchpadOpenRef.current = sketchpadOpen;
   useEffect(() => {
     if (!expandedView) return;
     void api.setQuickExpanded(true).catch(() => {});
@@ -355,9 +360,10 @@ function App() {
     let disposed = false, stop: undefined | (() => void), focusEpoch = 0;
     const handleFocus = ({ payload }: { payload: boolean }) => {
       const epoch = ++focusEpoch;
+      if (sketchpadOpenRef.current) return;
       if (payload) {
         void api.preferences().then(prefs => {
-          if (disposed || epoch !== focusEpoch) return;
+          if (disposed || epoch !== focusEpoch || sketchpadOpenRef.current) return;
           ++generation.current;
           setPreferences(prefs);
           setClipView(null); setSnippetDraft(undefined); setRenamePin(undefined); setToolDialog(undefined); setTransformOpen(false); setTemplateDialog(false); setPalette(false); setShortcutsOpen(false); setOrganizationOpen(false); setConfirmDelete(false);
@@ -542,6 +548,7 @@ function App() {
         return;
       }
       if (expandedView) {
+        if (sketchpadOpen) return;
         if (event.key === "Escape" && target.closest("[data-text-find-open]")) return;
         if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
           event.preventDefault();
@@ -551,6 +558,9 @@ function App() {
         return;
       }
       if (document.querySelector("dialog[open]")) return;
+      if (isQuick && isSketchpadShortcut(event)) {
+        event.preventDefault(); setSketchpadOpen(true); return;
+      }
       if (event.ctrlKey && event.shiftKey && !event.altKey && !event.metaKey && event.code === "KeyM") {
         event.preventDefault(); setCalculatorOpen(true); return;
       }
@@ -1040,6 +1050,7 @@ function App() {
       { label: "Text extractors · URLs, emails, paths and regex", run: () => setTextUtility({ kind: "extract", text: prepared ?? active?.text ?? "" }) },
       { label: "JSON explorer · selected text", run: () => setJsonText(prepared ?? active?.text ?? "") },
       { label: "Emoji catalog · Ctrl Shift J", run: () => setEmojiOpen(true) },
+      ...(isQuick ? [{ label: "Sketchpad · drawing and image copy · Ctrl Shift D", run: () => setSketchpadOpen(true) }] : []),
       { label: "Scientific calculator · saved worksheets · Ctrl Shift M", run: () => setCalculatorOpen(true) },
       ...Array.from({ length: 9 }, (_, index) => ({ label: `Paste last ${index + 1} clips · Ctrl Alt ${index + 1}`, run: () => void action(() => api.pasteRecent(index + 1), "Recent clips pasted") })),
       { label: "Filters & saved searches · Ctrl Shift F", run: () => setToolDialog("filters") },
@@ -1144,17 +1155,17 @@ function App() {
   );
   if (expandedView)
     return (
-      <div className="quick-shell expanded-shell">
+      <div className={`quick-shell expanded-shell ${sketchpadOpen ? "sketchpad-shell" : ""}`}>
         <header>
           <span className="brand">
             <ArchiverMark size={24} />
-            {calculatorOpen ? "Calculator" : clipView?.mode === "playground" ? "Paste Playground" : "Full clip"}
+            {sketchpadOpen ? "Sketchpad" : calculatorOpen ? "Calculator" : clipView?.mode === "playground" ? "Paste Playground" : "Full clip"}
           </span>
           <span className="esc-hint">
             <kbd>Esc</kbd> back to Librarian
           </span>
         </header>
-        {calculatorOpen ? <Suspense fallback={<p role="status">Loading calculator…</p>}><Calculator expanded onClose={() => setCalculatorOpen(false)} /></Suspense> : workbench(true)}
+        {sketchpadOpen ? <Sketchpad onClose={() => { setSketchpadOpen(false); requestAnimationFrame(() => listRef.current?.focus()); }} /> : calculatorOpen ? <Suspense fallback={<p role="status">Loading calculator…</p>}><Calculator expanded onClose={() => setCalculatorOpen(false)} /></Suspense> : workbench(true)}
         {toast && (
           <div className="toast" role="status">
             <Check size={16} />

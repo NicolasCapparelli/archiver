@@ -1,5 +1,9 @@
 # Plans and brainstorming
 
+## Sketchpad V1 delivery
+
+Sketchpad V1 implementation is complete at the user's request. [The delivery ledger](../milestones/sk1-sketchpad.md) retains evidence. [H38](../status.md#pending-human-checks) remains native follow-up. No next Sketchpad implementation is selected. Discuss next work with the user.
+
 This is the index for future work. [Roadmap](roadmap.md) owns selected work, sequencing and acceptance; [ideas](ideas.md) owns possibilities without a commitment. Substantial explorations belong in `studies/<topic>.md`, indexed below with topic, date, proposal/accepted/superseded state and a short conclusion. No study is required startup reading unless the current task needs it.
 
 ## Where the former planning documents went

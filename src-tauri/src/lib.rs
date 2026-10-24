@@ -18,4 +18,5 @@ pub mod recent;
 pub mod search;
 pub mod settings;
 pub mod shell;
+pub mod sketchpad;
 pub mod store;

@@ -1,5 +1,9 @@
 # Roadmap
 
+## SK1: Sketchpad V1
+
+User requested V1 completion, commit and push on 2026-10-23. Icon controls and Ctrl+Shift+D complete the implementation scope. [Delivery ledger](../milestones/sk1-sketchpad.md) records the outcome. H38 remains a native follow-up. Discuss next work with the user. No next Sketchpad implementation is selected. FS1 retains its separate queue.
+
 Owns selected next work, sequence and acceptance. Possibilities without a commitment are in [ideas](ideas.md). Migrated 2026-10-13 from the root ROADMAP.md and HANDOFF.md (originals removed; recovery copy recorded in the [implementation log](../implementation-log.md)). AGENTS.md still requires the in-app feature catalog `src/feature-catalog.tsx` to be kept aligned with this roadmap and [implemented features](../developer/implemented-features.md) after every implementation turn. Planned items are not implemented. Sequence between the R-items and the Q-queue was not stated by the user; the user's follow-up requests through R11 were prioritized.
 
 2026-10-14 documentation pass: root README now introduces implemented behavior for GitHub readers; no capabilities or priorities changed. Q3 remains next and native checks remain open. Two browser-demo screenshots were captured after explicit permission; they do not validate native behavior. Verification evidence: [setup](../developer/setup.md#documentation-verification-2026-10-14).

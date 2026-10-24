@@ -14,6 +14,17 @@ use std::{
 use tauri::{Emitter, Manager};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
+#[tauri::command]
+fn copy_sketch_image(app: tauri::AppHandle, window: tauri::WebviewWindow, state: tauri::State<State>, png: String) -> Result<(), String> {
+    let reps = archiver_core::sketchpad::image_representations(&png)?;
+    let capture = Capture { kind: "image".into(), text: "Sketchpad".into(), source: "Archiver Sketchpad".into(), timestamp: now(), directory: String::new(), session: String::new(), sequence: None, representations: reps.clone() };
+    lock(&state.store)?.capture_clipboard(&capture)?;
+    let _ = app.emit("archive-changed", ());
+    #[cfg(windows)]
+    { archiver_core::clipboard::restore(window.hwnd().map_err(|e| e.to_string())?.0 as _, &reps, "", false).map_err(|e| format!("Image archived, but clipboard copy failed: {e}")) }
+    #[cfg(not(windows))]
+    { let _ = window; Err("Sketch clipboard copying requires Windows. Image archived.".into()) }
+}
 struct State {
     store: Arc<Mutex<Store>>,
     paused: Arc<AtomicBool>,
@@ -1560,6 +1571,7 @@ fn main() {
             pause_capture,
             capture_status,
             copy_item,
+            copy_sketch_image,
             paste_item,
             paste_recent,
             paste_destination,

@@ -2,6 +2,13 @@
 
 Newest first. Keep at most 10 entries and about 2,000 words; archive older entries under `history/implementation/YYYY-MM.md`. Archived early turns: [October 2026](history/implementation/2026-10.md).
 
+## 2026-10-23 (SK1.9): Sketchpad V1 delivery
+
+- **Outcome:** User requested V1 completion and publication, then discussion of next work. One compact icon row replaces separate text action rows. Icon actions have accessible names and hover descriptions. Ctrl+Shift+D opens Sketchpad in Librarian. Exact-modifier tests reject adjacent chords. Named local sketches, drawing, boxed text, selection, erasing, history, zoom/pan and permanent image capture complete V1.
+- **Scope:** Sketchpad helpers/component, native image conversion, main/API integration, styles, palette, catalog and test script are included. Unrelated working-tree changes remain excluded. The closed ledger preserves task ownership, limits and evidence. Status, baseline, model, design, usage, map and planning agree. No next implementation is selected.
+- **Checks:** The exact scoped staged snapshot passes production build/typecheck, 54 frontend tests, Rust check and 75 Rust library tests. Three opt-in tests remain ignored. The full working tree also passes build and 74 frontend tests. Existing bundle/cache warnings remain. No computer control, native launch or installer. H38 retains native layout, scaling, recovery and paste checks. Automated checks do not close H38.
+- **Handoff:** Publication is authorized and prepared for commit. Run `npm run launch`, then Ctrl+Shift+D in Librarian. Check icon tooltips, focus, Fit/Canvas, saved A/B lifecycle, text/history and image paste. Discuss next work before implementation.
+
 ## 2026-10-19: Calculator publication approved and completed
 
 - **Published**: user explicitly approved repository transfer to `https://github.com/NicolasCapparelli/archiver.git` main. Push succeeded through `c435685`, including implementation `d1d3868`. Status updated to remove the resolved approval blocker. No runtime change or additional tests required; previous R22 verification applies.

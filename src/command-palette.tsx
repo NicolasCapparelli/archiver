@@ -173,6 +173,7 @@ export function CommandPalette({
   );
 }
 const shortcuts = [
+  ["Tools and library", "Ctrl + Shift + D (Librarian)", "Open Sketchpad: draw, add text, save local sketches and copy images"],
   ["Tools and library", "Ctrl + Alt + 1–9 (Windows)", "Paste up to N recent clipboard records oldest to newest: text joined by line breaks, images/files as files; mixed text/file batches report an error"],
   ["Tools and library", "Ctrl + Shift + M", "Scientific calculator: natural fractions/powers/roots, variables and DEG/RAD; Enter saves; Up/Down recalls and restores draft; Tab completes functions/variables or navigates math; Ctrl+Shift+C copies last result; draft/context recover on reopening"],
   ["Navigation", "Ctrl + Tab / Ctrl + Shift + Tab", "Next/previous Librarian category from tabs or results"],

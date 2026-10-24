@@ -1,5 +1,20 @@
 # Data model
 
+## Sketchpad runtime lifecycle (SK1.2–SK1.8)
+
+`sketchpad-history.ts` keeps validated immutable snapshots, capped at 100 undo actions and 16 MiB serialized history. Transient gestures remain outside committed state. New/Open and reopening reset history. `sketchpad-storage.ts` validates the version-1 `archiver-sketchbook-v1` WebView localStorage collection. It holds up to 50 named snapshots and one working workspace with active saved ID, name and document. One atomic write persists both. Saved snapshots remain independent until Save. Deleting the active entry detaches the working draft. Unsaved switches and deletes require confirmation. Total serialized collection size caps at 16 MiB. Browser quota can be smaller. Failed writes retain in-memory work and report failure. Invalid recovery blocks writes and leaves stored data unchanged. When no collection exists, the old `archiver-sketchpad-v1` draft loads without changing its source. Storage remains outside archive exports/backups.
+
+SK1.7 adds optional positive finite `box: { width, height }` to version-1 text objects. Each dimension caps at 100,000. Legacy unboxed text remains valid. Validation copies the box. `sketchpad-text.ts` wraps boxed text using the same font metrics for SVG and PNG. Text can grow vertically beyond the drawn minimum height. Geometry uses the box width and rendered text height. Undo with no available history does not write recovery storage. View translation and scale stay transient, outside documents, history and image output. `sketchpad-viewport.ts` owns fit, inverse coordinates and anchored zoom. User zoom caps at 0.1–800 percent. Fit uses current stage dimensions and artwork bounds including stroke edges, capped at 800 percent. Canvas frames the full page. Shared wrapping preserves grapheme clusters. Aggregate point budgets stop strokes before an invalid commit.
+
+`copy_sketch_image` validates base64/PNG bounds and exact 1200×800 dimensions before decoding. Rust produces PNG and CF_DIB representations. Explicit store capture preserves a permanent deduplicated image before Windows clipboard publication. Clipboard failure leaves the archive record and draft intact. Repeated copies can increase occurrence counts while retaining one content item. The self-copy listener guard is unchanged. No schema migration. Browser previews use image clipboard support without archive capture.
+
+
+## Sketchpad foundation (SK1.1)
+
+`src/sketchpad-model.ts` defines version-1 1200×800 documents with ordered stroke, line, rectangle, ellipse, and text objects. IDs are unique. Styles use explicit hex colors. Validation copies known fields and rejects unsupported versions, nonfinite geometry, invalid styles, and aggregate budget violations. Limits: 1,000 objects, 100,000 stroke points, 10,000 UTF-16 text units, and 16 MiB serialized UTF-8. Parsing checks bytes before JSON decoding. Replacement commands validate before returning new state. No archive schema change. The runtime lifecycle above owns delivered recovery and history behavior.
+
+Evidence: schema definitions in `src-tauri/src` (listed below), inspected 2026-10-13. `PRAGMA user_version` is set to 2 in `store.rs` `open`. There is no migrations directory: tables are created idempotently with `CREATE TABLE IF NOT EXISTS`, and one-time migrations run on open (library initialization, fuzzy index build, snippet note and item title column detection).
+
 Evidence: schema definitions in `src-tauri/src` (listed below), inspected 2026-10-13. `PRAGMA user_version` is set to 2 in `store.rs` `open`. There is no migrations directory: tables are created idempotently with `CREATE TABLE IF NOT EXISTS`, and one-time migrations run on open (library initialization, fuzzy index build, snippet note and item title column detection).
 
 ## Overview and schema routes

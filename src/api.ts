@@ -1,4 +1,15 @@
 import { invoke, isTauri } from "@tauri-apps/api/core";
+export async function copySketchImage(blob: Blob): Promise<void> {
+  if (isTauri()) {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = "";
+    for (let offset = 0; offset < bytes.length; offset += 8192) binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192));
+    await invoke("copy_sketch_image", { png: btoa(binary) });
+  } else {
+    if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") throw new Error("Image copy requires the Windows app or clipboard-enabled browser");
+    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+  }
+}
 export interface Item {
   id: string;
   kind: string;
